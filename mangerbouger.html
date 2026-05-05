@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Révision Mathématiques — Première Spécialité</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 15px; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #06080F;
+  color: #E8ECF0;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+:root {
+  --shinji:    #6EC1E4;
+  --shinji-bg: #1A2A44;
+  --shinji-dim:#2A4060;
+  --asuka:     #FF3B3B;
+  --asuka-b:   #FF8C42;
+  --asuka-bg:  #1A0A08;
+  --asuka-dim: #2A1008;
+  --rei:       #AEE6FF;
+  --rei-bg:    #0D1820;
+  --rei-dim:   #1A2832;
+  --kaworu:    #B388EB;
+  --kaworu-bg: #16102A;
+  --kaworu-dim:#221840;
+  --proba:     #5BE0A8;
+  --proba-bg:  #091A14;
+  --proba-dim: #112A20;
+  --algo:      #F0C040;
+  --algo-bg:   #1A1408;
+  --algo-dim:  #2A2010;
+  --border:    rgba(255,255,255,0.07);
+  --text-muted: rgba(232,236,240,0.5);
+  --mono: 'DM Mono', monospace;
+  --head: 'Orbitron', sans-serif;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(6,8,15,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px;
+  height: 52px; gap: 2px;
+  overflow-x: auto;
+}
+.nav::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+}
+.nav-logo {
+  font-family: var(--head);
+  font-size: 9px; letter-spacing: 3px; color: rgba(255,255,255,0.3);
+  white-space: nowrap; margin-right: 12px; flex-shrink: 0;
+  text-transform: uppercase;
+}
+.nav-tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 14px; border-radius: 6px; cursor: pointer;
+  font-family: var(--head); font-size: 7.5px; letter-spacing: 1.5px;
+  text-transform: uppercase; border: none; background: transparent;
+  color: rgba(255,255,255,0.35); transition: all .25s;
+  white-space: nowrap; flex-shrink: 0;
+  position: relative;
+}
+.nav-tab:hover { color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.05); }
+.nav-tab.active { color: #fff; background: rgba(255,255,255,0.08); }
+.nav-tab .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor; opacity: 0.7; flex-shrink: 0;
+}
+.nav-tab[data-target="p1"] .dot { background: var(--shinji); }
+.nav-tab[data-target="p2"] .dot { background: var(--asuka); }
+.nav-tab[data-target="p3"] .dot { background: var(--rei); }
+.nav-tab[data-target="p4"] .dot { background: var(--kaworu); }
+.nav-tab[data-target="p5"] .dot { background: var(--proba); }
+.nav-tab[data-target="p6"] .dot { background: var(--algo); }
+.page { display: none; padding-top: 52px; animation: pageIn .4s ease; position: relative; }
+.page.active { display: block; }
+@keyframes pageIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.page-header {
+  position: relative; overflow: hidden;
+  padding: 48px 32px 28px;
+  display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 20px;
+  isolation: isolate;
+}
+.page-header::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--page-grad);
+  opacity: 0.25; z-index: -1;
+}
+.page-header::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0.5;
+}
+.header-meta {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 2.5px;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 8px; opacity: 0.9;
+}
+.header-title {
+  font-family: var(--head); font-size: clamp(24px,4vw,34px);
+  font-weight: 900; letter-spacing: -1px; line-height: 1.1;
+  color: #fff; position: relative;
+}
+.header-subtitle {
+  font-size: 13px; color: var(--text-muted); margin-top: 8px;
+  font-weight: 300; letter-spacing: 1px;
+}
+.header-badge {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+  padding: 6px 18px; border-radius: 24px;
+  border: 1px solid var(--accent); color: var(--accent);
+  background: rgba(0,0,0,0.4); white-space: nowrap;
+  align-self: flex-start; margin-top: 6px;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.header-num {
+  font-family: var(--head); font-size: clamp(70px,12vw,120px);
+  font-weight: 900; color: var(--accent); opacity: 0.05;
+  line-height: 1; user-select: none; pointer-events: none;
+  position: absolute; right: 28px; top: 16px; letter-spacing: -6px;
+}
+.char-img {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 45%;
+  background-size: cover; background-position: center top;
+  opacity: 0.09; z-index: -1; mask-image: linear-gradient(to left, rgba(0,0,0,0.6), transparent);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.6), transparent);
+}
+.content { padding: 24px 32px 60px; position: relative; z-index: 2; }
+.section { margin-bottom: 36px; }
+.section-title {
+  font-family: var(--head); font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+}
+.section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 14px; }
+@media (max-width: 800px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .content { padding: 16px 16px 48px; }
+  .page-header { padding: 36px 16px 24px; grid-template-columns: 1fr; }
+  .char-img { display: none; }
+}
+.card {
+  background: var(--card-bg, rgba(255,255,255,0.025));
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 20px 22px; position: relative; overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
+}
+.card:hover { border-color: rgba(255,255,255,0.18); box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.25;
+}
+.card.accent-border { border-left: 2px solid var(--accent); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+.card-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 12px; opacity: 0.9;
+}
+.card-title {
+  font-size: 15px; font-weight: 600; margin-bottom: 10px; color: #fff;
+}
+.card p, .card li { font-size: 13.5px; color: rgba(232,236,240,0.8); line-height: 1.7; }
+.card ul, .card ol { padding-left: 20px; }
+.card li { margin-bottom: 5px; }
+.formula {
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius); padding: 16px 20px; margin: 12px 0;
+  font-family: var(--mono); font-size: 14px; color: #fff;
+  text-align: center; letter-spacing: 0.3px; line-height: 1.9;
+  position: relative;
+}
+.formula.accent {
+  border-color: var(--accent); background: rgba(0,0,0,0.5);
+  color: var(--accent);
+  box-shadow: 0 0 24px -8px var(--accent);
+}
+.formula sub, .formula sup { font-size: 0.75em; }
+.data-table {
+  width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0;
+}
+.data-table th {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--accent); padding: 10px 14px;
+  border-bottom: 1px solid var(--accent); text-align: left; opacity: 0.8;
+}
+.data-table td {
+  padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-family: var(--mono); font-size: 12.5px; color: rgba(232,236,240,0.85);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table td:first-child { color: var(--accent); opacity: 0.9; }
+.data-table tr:hover td { background: rgba(255,255,255,0.015); }
+.tag {
+  display: inline-block; font-family: var(--mono); font-size: 10px;
+  letter-spacing: 1px; padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--accent); color: var(--accent);
+  background: rgba(0,0,0,0.35); margin: 3px 3px 3px 0;
+}
+.hl {
+  background: rgba(255,255,255,0.02); border-left: 2px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 16px; margin: 10px 0; font-size: 13.5px;
+  color: rgba(232,236,240,0.85); line-height: 1.7;
+}
+.hl strong { color: var(--accent); font-weight: 600; }
+.hl.warn { border-left-color: #F0C040; }
+.hl.warn strong { color: #F0C040; }
+.diagram-wrap {
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  overflow: hidden; background: rgba(0,0,0,0.3);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 16px 16px;
+}
+.diagram-caption {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
+  color: var(--text-muted); text-transform: uppercase; margin-top: 12px; text-align: center;
+}
+svg text { font-family: 'DM Mono', monospace; }
+.sign-table {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+  font-family: var(--mono); margin: 10px 0;
+}
+.sign-table th, .sign-table td {
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 9px 12px; text-align: center;
+}
+.sign-table th { background: rgba(0,0,0,0.4); color: var(--accent); font-size: 10px; letter-spacing: 1px; }
+.sign-table td.pos { color: #5BE0A8; }
+.sign-table td.neg { color: #FF3B3B; }
+.sign-table td.zero { color: #F0C040; }
+.summary-box {
+  border: 1px solid var(--accent); border-radius: var(--radius-lg);
+  padding: 24px 26px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(0,0,0,0.25));
+  margin-top: 32px; position: relative; overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+.summary-box::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at top left, rgba(var(--accent-rgb),0.06), transparent 70%);
+}
+.summary-title {
+  font-family: var(--head); font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+}
+.summary-list { list-style: none; padding: 0; }
+.summary-list li {
+  font-size: 13px; padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: rgba(232,236,240,0.8); font-family: var(--mono);
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.summary-list li::before { content: '▸'; color: var(--accent); flex-shrink: 0; font-size: 10px; margin-top: 4px; }
+.summary-list li:last-child { border-bottom: none; }
+.steps { display: flex; flex-direction: column; gap: 10px; }
+.step {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: rgba(255,255,255,0.015); border-radius: var(--radius); padding: 12px 14px;
+  border: 1px solid var(--border);
+}
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: var(--accent); color: #000;
+  font-family: var(--head); font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 14px -2px var(--accent);
+}
+.step-body { font-size: 13.5px; color: rgba(232,236,240,0.85); line-height: 1.7; }
+.step-body strong { color: #fff; }
+.code-block {
+  background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius); padding: 16px 18px; margin: 10px 0;
+  font-family: var(--mono); font-size: 12px; line-height: 1.9;
+  color: rgba(232,236,240,0.85); overflow-x: auto;
+  white-space: pre;
+}
+.code-block .kw { color: var(--accent); font-weight: 600; }
+.code-block .cm { color: rgba(255,255,255,0.25); font-style: italic; }
+.code-block .num { color: #B388EB; }
+.code-block .str { color: #5BE0A8; }
+.divider { height: 1px; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent); margin: 24px 0; }
+.ac { color: var(--accent); font-weight: 600; }
+
+#p1 { --accent: #6EC1E4; --accent-rgb: 110,193,228; --page-grad: linear-gradient(135deg, #0E1A2E, #060E1A); }
+#p1 .card { --card-bg: rgba(14,26,46,0.55); }
+
+#p2 { --accent: #FF3B3B; --accent-rgb: 255,59,59; --page-grad: linear-gradient(135deg, #140606, #0A0202); }
+#p2 .card { --card-bg: rgba(20,6,6,0.55); }
+
+#p3 { --accent: #AEE6FF; --accent-rgb: 174,230,255; --page-grad: linear-gradient(135deg, #09141E, #040A10); }
+#p3 .card { --card-bg: rgba(9,20,30,0.55); }
+
+#p4 { --accent: #B388EB; --accent-rgb: 179,136,235; --page-grad: linear-gradient(135deg, #100A20, #080410); }
+#p4 .card { --card-bg: rgba(16,10,32,0.55); }
+
+#p5 { --accent: #5BE0A8; --accent-rgb: 91,224,168; --page-grad: linear-gradient(135deg, #061410, #020A06); }
+#p5 .card { --card-bg: rgba(6,20,16,0.55); }
+
+#p6 { --accent: #F0C040; --accent-rgb: 240,192,64; --page-grad: linear-gradient(135deg, #141006, #080602); }
+#p6 .card { --card-bg: rgba(20,16,6,0.55); }
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px -2px var(--accent); }
+  50% { box-shadow: 0 0 22px -2px var(--accent); }
+}
+.card.accent-border { animation: glowPulse 3s infinite; }
+
+.particles {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0; opacity: 0.4;
+}
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: float linear infinite;
+}
+@keyframes float {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.7; }
+  100% { transform: translateY(-110vh) scale(0.3); opacity: 0; }
+}
+
+.interactive-graph {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  margin: 12px 0;
+  text-align: center;
+}
+.interactive-graph svg {
+  max-width: 100%;
+  height: auto;
+}
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+}
+.slider-container input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+</style>
+</head>
+<body>
+
+<canvas class="particles" id="particleCanvas"></canvas>
+
+<nav class="nav">
+  <div class="nav-logo">Maths Première</div>
+  <button class="nav-tab active" data-target="p1" onclick="show('p1',this)">
+    <span class="dot"></span> Trinôme
+  </button>
+  <button class="nav-tab" data-target="p2" onclick="show('p2',this)">
+    <span class="dot"></span> Dérivée
+  </button>
+  <button class="nav-tab" data-target="p3" onclick="show('p3',this)">
+    <span class="dot"></span> Règles & Exp
+  </button>
+  <button class="nav-tab" data-target="p4" onclick="show('p4',this)">
+    <span class="dot"></span> Suites
+  </button>
+  <button class="nav-tab" data-target="p5" onclick="show('p5',this)">
+    <span class="dot"></span> Probabilités
+  </button>
+  <button class="nav-tab" data-target="p6" onclick="show('p6',this)">
+    <span class="dot"></span> Algorithmes
+  </button>
+</nav>
+
+<div class="page active" id="p1">
+  <div class="char-img" style="background-image: url('shinji.png'); opacity: 1;"></div>
+  <header class="page-header">
+    <div>
+      <div class="header-meta">Fiche 01 · Analyse Algébrique</div>
+      <div class="header-title">Trinôme du second degré</div>
+      <div class="header-subtitle">Formes canonique, discriminant, signes, inéquations</div>
+    </div>
+    <div class="header-badge">SHINJI IKARI</div>
+    <div class="header-num">01</div>
+  </header>
+
+  <div class="content">
+    <div class="section">
+      <div class="section-title">Formes du trinôme</div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-label">Forme développée</div>
+          <div class="formula">f(x) = ax² + bx + c</div>
+          <p>avec <span class="ac">a ≠ 0</span>, a, b, c ∈ ℝ</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Forme canonique</div>
+          <div class="formula">f(x) = a(x − α)² + β</div>
+          <p><span class="ac">α = −b/(2a)</span> est l'axe de symétrie<br>
+          <span class="ac">β = f(α)</span> est le sommet</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Forme factorisée</div>
+          <div class="formula">f(x) = a(x − x₁)(x − x₂)</div>
+          <p>Possible uniquement si <span class="ac">Δ ≥ 0</span>. x₁ et x₂ sont les racines.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Discriminant Δ</div>
+      <div class="grid-2">
+        <div class="card accent-border">
+          <div class="card-label">Calcul</div>
+          <div class="formula accent">Δ = b² − 4ac</div>
+          <div class="divider"></div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body"><strong>Identifier</strong> a, b, c dans f(x) = ax² + bx + c</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body"><strong>Calculer</strong> b² puis soustraire 4ac</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body"><strong>Analyser</strong> le signe de Δ</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Solutions selon Δ</div>
+          <table class="data-table">
+            <tr><th>Cas</th><th>Racines</th></tr>
+            <tr><td>Δ &gt; 0</td><td>2 racines réelles distinctes<br>x₁,₂ = (−b ± √Δ) / 2a</td></tr>
+            <tr><td>Δ = 0</td><td>1 racine double<br>x₀ = −b / 2a</td></tr>
+            <tr><td>Δ &lt; 0</td><td>Aucune racine réelle</td></tr>
+          </table>
+          <div class="hl"><strong>Δ &gt; 0 :</strong> x₁ = (−b − √Δ)/2a &nbsp;|&nbsp; x₂ = (−b + √Δ)/2a</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Signe du trinôme &amp; concavité</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Règle générale</div>
+          <div class="hl"><strong>a &gt; 0 :</strong> parabole tournée vers le haut (concave vers le haut)<br>
+          f(x) est du <strong>signe de a</strong> à l'extérieur des racines.</div>
+          <div class="hl"><strong>a &lt; 0 :</strong> parabole tournée vers le bas (concave vers le bas)<br>
+          f(x) est du <strong>signe de a</strong> entre les racines.</div>
+          <div class="hl warn"><strong>Résumé :</strong> f(x) est du signe de a sauf entre x₁ et x₂ (si Δ &gt; 0).</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Tableau de signes — a &gt; 0, Δ &gt; 0</div>
+          <table class="sign-table">
+            <tr><th>x</th><th>−∞</th><th>x₁</th><th></th><th>x₂</th><th>+∞</th></tr>
+            <tr><td>f(x)</td><td class="pos">+</td><td class="zero">0</td><td class="neg">−</td><td class="zero">0</td><td class="pos">+</td></tr>
+          </table>
+          <table class="sign-table" style="margin-top:12px">
+            <caption style="font-family:var(--mono);font-size:10px;color:var(--text-muted);text-align:left;padding-bottom:6px">a &gt; 0, Δ = 0</caption>
+            <tr><th>x</th><th>−∞</th><th>x₀</th><th>+∞</th></tr>
+            <tr><td>f(x)</td><td class="pos">+</td><td class="zero">0</td><td class="pos">+</td></tr>
+          </table>
+          <table class="sign-table" style="margin-top:12px">
+            <caption style="font-family:var(--mono);font-size:10px;color:var(--text-muted);text-align:left;padding-bottom:6px">a &gt; 0, Δ &lt; 0</caption>
+            <tr><th>x</th><th>−∞</th><th>+∞</th></tr>
+            <tr><td>f(x)</td><td class="pos">+</td><td class="pos">+</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Représentation graphique &amp; inéquations</div>
+      <div class="grid-2">
+        <div class="interactive-graph" id="graphTrinome">
+          <svg width="320" height="240" viewBox="0 0 320 240">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6EC1E4" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#6EC1E4" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line x1="20" y1="120" x2="300" y2="120" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+            <line x1="160" y1="10" x2="160" y2="230" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+            <text x="295" y="115" fill="rgba(255,255,255,0.3)" font-size="9">x</text>
+            <text x="165" y="22" fill="rgba(255,255,255,0.3)" font-size="9">y</text>
+            <path id="parabolaPath" d="M 40,180 Q 160,20 280,180" fill="url(#g1)" stroke="#6EC1E4" stroke-width="2.5" fill-opacity="0.25"/>
+            <circle id="rootLeft" cx="76" cy="120" r="4" fill="#6EC1E4"/>
+            <text id="rootLeftLabel" x="72" y="135" fill="#6EC1E4" font-size="9">x₁</text>
+            <circle id="rootRight" cx="244" cy="120" r="4" fill="#6EC1E4"/>
+            <text id="rootRightLabel" x="240" y="135" fill="#6EC1E4" font-size="9">x₂</text>
+            <circle id="vertex" cx="160" cy="40" r="4" fill="#F0C040"/>
+            <text id="vertexLabel" x="165" y="38" fill="#F0C040" font-size="9">S(α,β)</text>
+            <line x1="160" y1="40" x2="160" y2="120" stroke="#F0C040" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+            <text x="163" y="85" fill="#F0C040" font-size="9">x=α</text>
+            <text x="100" y="105" fill="rgba(255,255,255,0.2)" font-size="9">f(x)&lt;0</text>
+            <text x="25" y="100" fill="#5BE0A8" font-size="9">f(x)&gt;0</text>
+            <text x="250" y="100" fill="#5BE0A8" font-size="9">f(x)&gt;0</text>
+            <text x="20" y="210" fill="rgba(255,255,255,0.25)" font-size="9">a &gt; 0 → ∪</text>
+          </svg>
+          <div class="slider-container">
+            <span>a</span>
+            <input type="range" id="sliderA" min="0.5" max="3" step="0.1" value="1.5" oninput="updateParabola()">
+            <span id="sliderAVal">1.5</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Méthode — Inéquations du 2nd degré</div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">Ramener l'inéquation à <strong>f(x) &gt; 0</strong> (ou &lt; 0)</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">Calculer Δ, trouver x₁ et x₂ si Δ ≥ 0</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">Dresser le tableau de signes de f(x)</div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-body">Lire la solution sur le tableau (intervalles)</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="hl"><strong>Exemple :</strong> x² − 3x + 2 &lt; 0<br>
+          Δ = 9 − 8 = 1 &gt; 0 → x₁ = 1, x₂ = 2<br>
+          Solution : <strong>x ∈ ]1 ; 2[</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">Récapitulatif — Trinôme du second degré</div>
+      <ul class="summary-list">
+        <li>f(x) = ax² + bx + c avec a ≠ 0</li>
+        <li>Δ = b² − 4ac détermine le nombre de racines réelles</li>
+        <li>Δ &gt; 0 : x₁,₂ = (−b ± √Δ) / 2a</li>
+        <li>Forme canonique : f(x) = a(x − α)² + β, sommet S(α, β)</li>
+        <li>Signe de f : du signe de a sauf entre les racines (si Δ &gt; 0)</li>
+        <li>Concavité : vers le haut si a &gt; 0, vers le bas si a &lt; 0</li>
+        <li>Inéquation : tableau de signes → lire les intervalles solutions</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="p2">
+  <div class="char-img" style="background-image: url('asuka.png'); opacity: 1;"></div>
+  <header class="page-header">
+    <div>
+      <div class="header-meta">Fiche 02 · Analyse</div>
+      <div class="header-title">Dérivée &amp; Tangente</div>
+      <div class="header-subtitle">Nombre dérivé, équation de tangente, variations</div>
+    </div>
+    <div class="header-badge">ASUKA LANGLEY</div>
+    <div class="header-num">02</div>
+  </header>
+
+  <div class="content">
+    <div class="section">
+      <div class="section-title">Définition — Nombre dérivé</div>
+      <div class="grid-2">
+        <div class="card accent-border">
+          <div class="card-label">Taux de variation</div>
+          <div class="formula">τ = [f(a + h) − f(a)] / h</div>
+          <p>Taux de variation de f entre a et a+h.</p>
+          <div class="divider"></div>
+          <div class="card-label">Dérivée en a</div>
+          <div class="formula accent">f'(a) = lim<sub>h→0</sub> [f(a+h) − f(a)] / h</div>
+          <p>f est <strong>dérivable en a</strong> si cette limite existe et est finie.</p>
+        </div>
+        <div class="interactive-graph" id="graphDerivee">
+          <svg width="320" height="240" viewBox="0 0 320 240">
+            <line x1="20" y1="200" x2="305" y2="200" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+            <line x1="40" y1="10" x2="40" y2="220" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+            <path id="curve2" d="M 50,190 C 90,160 130,110 170,90 S 240,70 280,60" fill="none" stroke="#FF3B3B" stroke-width="2.5"/>
+            <circle id="pointA" cx="140" cy="116" r="5" fill="#FF8C42"/>
+            <text id="pointALabel" x="148" y="112" fill="#FF8C42" font-size="10">A(a,f(a))</text>
+            <line id="tangentLine" x1="60" y1="180" x2="260" y2="52" stroke="#FF8C42" stroke-width="2" stroke-dasharray="6,4"/>
+            <text x="265" y="55" fill="#FF8C42" font-size="10">tangente</text>
+            <text x="20" y="230" fill="rgba(255,255,255,0.25)" font-size="9">h → 0</text>
+          </svg>
+          <div class="slider-container">
+            <span>a</span>
+            <input type="range" id="sliderDeriv" min="60" max="240" step="1" value="140" oninput="updateDerivee()">
+            <span id="sliderDerivVal">3.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Équation de la tangente</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Formule</div>
+          <div class="formula accent">y = f'(a)(x − a) + f(a)</div>
+          <p>Tangente à la courbe de f au point d'abscisse <span class="ac">a</span>.<br>
+          Pente (coefficient directeur) : <span class="ac">m = f'(a)</span></p>
+          <div class="divider"></div>
+          <div class="card-label">Interprétation géométrique</div>
+          <ul>
+            <li><span class="ac">f'(a) &gt; 0</span> → tangente montante</li>
+            <li><span class="ac">f'(a) &lt; 0</span> → tangente descendante</li>
+            <li><span class="ac">f'(a) = 0</span> → tangente horizontale (extremum local possible)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-label">Méthode — Trouver l'équation de tangente</div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">Calculer <strong>f(a)</strong> : ordonnée du point de tangence</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">Calculer <strong>f'(x)</strong> puis <strong>f'(a)</strong> : pente de la tangente</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">Substituer dans <strong>y = f'(a)(x − a) + f(a)</strong></div>
+            </div>
+          </div>
+          <div class="hl" style="margin-top:14px">
+            <strong>Exemple :</strong> f(x) = x², a = 3<br>
+            f(3) = 9 &nbsp;|&nbsp; f'(x) = 2x → f'(3) = 6<br>
+            <strong>Tangente : y = 6(x − 3) + 9 = 6x − 9</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Application aux variations</div>
+      <div class="grid-3">
+        <div class="card" style="border-color:rgba(91,224,168,0.25)">
+          <div class="card-label" style="color:#5BE0A8">f croissante sur I</div>
+          <div class="formula" style="color:#5BE0A8">f'(x) &gt; 0 sur I</div>
+          <p>La dérivée est strictement positive sur l'intervalle.</p>
+        </div>
+        <div class="card" style="border-color:rgba(240,192,64,0.25)">
+          <div class="card-label" style="color:#F0C040">Extremum local en a</div>
+          <div class="formula" style="color:#F0C040">f'(a) = 0</div>
+          <p>Et f' change de signe en a. Maximum si f' passe de + à −. Minimum si f' passe de − à +.</p>
+        </div>
+        <div class="card" style="border-color:rgba(255,59,59,0.25)">
+          <div class="card-label" style="color:var(--asuka)">f décroissante sur I</div>
+          <div class="formula" style="color:var(--asuka)">f'(x) &lt; 0 sur I</div>
+          <p>La dérivée est strictement négative sur l'intervalle.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Trouver une équation à partir d'une tangente</div>
+      <div class="card">
+        <div class="card-label">Méthode inverse</div>
+        <div class="grid-2" style="gap:18px;margin-top:12px">
+          <div>
+            <p style="margin-bottom:10px">On connaît la tangente <strong>y = mx + p</strong> en x = a. Alors :</p>
+            <div class="formula">f(a) = ma + p &nbsp;(ordonnée du point)</div>
+            <div class="formula">f'(a) = m &nbsp;(pente de la tangente)</div>
+            <p style="margin-top:10px">Ces deux conditions permettent de déterminer les constantes d'une famille de fonctions.</p>
+          </div>
+          <div class="hl">
+            <strong>Exemple :</strong><br>
+            f(x) = ax² + b. La tangente en x = 2 est y = 4x − 3.<br>
+            f(2) = 4(2) − 3 = 5 → 4a + b = 5<br>
+            f'(x) = 2ax → f'(2) = 4a = 4 → a = 1<br>
+            Donc b = 1. <strong>f(x) = x² + 1</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">Récapitulatif — Dérivée &amp; Tangente</div>
+      <ul class="summary-list">
+        <li>f'(a) = lim(h→0) [f(a+h) − f(a)] / h</li>
+        <li>Équation de tangente en a : y = f'(a)(x − a) + f(a)</li>
+        <li>f'(x) &gt; 0 ⟹ f croissante &nbsp;|&nbsp; f'(x) &lt; 0 ⟹ f décroissante</li>
+        <li>f'(a) = 0 avec changement de signe ⟹ extremum local en a</li>
+        <li>Pente de la tangente = f'(a) = coefficient directeur</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="p3">
+  <div class="char-img" style="background-image: url('rei.webp'); opacity: 1;"></div>
+  <header class="page-header">
+    <div>
+      <div class="header-meta">Fiche 03 · Analyse</div>
+      <div class="header-title">Règles de dérivation &amp; Exponentielle</div>
+      <div class="header-subtitle">Dérivées usuelles, opérations, fonction exp</div>
+    </div>
+    <div class="header-badge">REI AYANAMI</div>
+    <div class="header-num">03</div>
+  </header>
+
+  <div class="content">
+    <div class="section">
+      <div class="section-title">Dérivées usuelles</div>
+      <div class="card">
+        <table class="data-table">
+          <tr><th>f(x)</th><th>f'(x)</th><th>Conditions</th></tr>
+          <tr><td>k (constante)</td><td>0</td><td>k ∈ ℝ</td></tr>
+          <tr><td>x</td><td>1</td><td></td></tr>
+          <tr><td>xⁿ</td><td>n·xⁿ⁻¹</td><td>n ∈ ℤ</td></tr>
+          <tr><td>√x</td><td>1 / (2√x)</td><td>x &gt; 0</td></tr>
+          <tr><td>1/x</td><td>−1/x²</td><td>x ≠ 0</td></tr>
+          <tr><td>1/xⁿ</td><td>−n/xⁿ⁺¹</td><td>x ≠ 0</td></tr>
+          <tr><td>eˣ</td><td>eˣ</td><td></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Règles de dérivation</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Opérations sur les fonctions</div>
+          <table class="data-table">
+            <tr><th>Fonction</th><th>Dérivée</th></tr>
+            <tr><td>(u + v)'</td><td>u' + v'</td></tr>
+            <tr><td>(ku)'</td><td>k·u'</td></tr>
+            <tr><td>(uv)'</td><td>u'v + uv'</td></tr>
+            <tr><td>(u/v)'</td><td>(u'v − uv') / v²</td></tr>
+            <tr><td>(1/v)'</td><td>−v' / v²</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-label">Composition — Dérivée de u∘v</div>
+          <div class="formula accent">[f(g(x))]' = g'(x) · f'(g(x))</div>
+          <div class="divider"></div>
+          <div class="card-label">Cas fréquents</div>
+          <table class="data-table">
+            <tr><th>f(x)</th><th>f'(x)</th></tr>
+            <tr><td>(ax + b)ⁿ</td><td>na(ax + b)ⁿ⁻¹</td></tr>
+            <tr><td>√(u(x))</td><td>u'(x) / (2√u)</td></tr>
+            <tr><td>eᵘ⁽ˣ⁾</td><td>u'(x) · eᵘ⁽ˣ⁾</td></tr>
+            <td>u'(x) / u(x)</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Fonction exponentielle</div>
+      <div class="grid-2">
+        <div class="card accent-border">
+          <div class="card-label">Définition &amp; notation</div>
+          <div class="formula accent">f(x) = eˣ = exp(x)</div>
+          <p>Unique fonction dérivable sur ℝ telle que <span class="ac">f' = f</span> et <span class="ac">f(0) = 1</span>.</p>
+          <div class="divider"></div>
+          <div class="card-label">Propriétés algébriques</div>
+          <table class="data-table">
+            <tr><td>eᵃ · eᵇ</td><td>= eᵃ⁺ᵇ</td></tr>
+            <tr><td>eᵃ / eᵇ</td><td>= eᵃ⁻ᵇ</td></tr>
+            <tr><td>(eᵃ)ⁿ</td><td>= eⁿᵃ</td></tr>
+            <tr><td>e⁰</td><td>= 1</td></tr>
+            <tr><td>e⁻ˣ</td><td>= 1/eˣ</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-label">Tableau de variations</div>
+          <table class="sign-table">
+            <tr><th>x</th><th>−∞</th><th></th><th>0</th><th></th><th>+∞</th></tr>
+            <tr><td>eˣ</td><td>→ 0⁺</td><td class="pos">↗</td><td>1</td><td class="pos">↗</td><td>→ +∞</td></tr>
+          </table>
+          <div class="hl" style="margin-top:14px">
+            <strong>eˣ &gt; 0 pour tout x ∈ ℝ</strong><br>
+            eˣ est strictement croissante sur ℝ
+          </div>
+          <div class="interactive-graph" id="graphExp" style="margin-top:14px">
+            <svg width="280" height="160" viewBox="0 0 280 160">
+              <line x1="20" y1="130" x2="270" y2="130" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+              <line x1="110" y1="5" x2="110" y2="145" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+              <path d="M 20,128 C 60,125 90,115 110,105 S 160,65 190,38 S 220,20 260,10"
+                fill="none" stroke="#AEE6FF" stroke-width="2.5"/>
+              <circle cx="110" cy="105" r="4" fill="#F0C040"/>
+              <text x="115" y="102" fill="#F0C040" font-size="10">(0, 1)</text>
+              <text x="220" y="20" fill="#AEE6FF" font-size="10">y=eˣ</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Exemples de calcul de dérivée</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Exemple 1 — Produit</div>
+          <div class="hl">f(x) = x²·eˣ<br>
+          u = x² → u' = 2x<br>
+          v = eˣ → v' = eˣ<br>
+          <strong>f'(x) = 2x·eˣ + x²·eˣ = eˣ(2x + x²)</strong></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Exemple 2 — Quotient</div>
+          <div class="hl">f(x) = eˣ / x<br>
+          u = eˣ → u' = eˣ<br>
+          v = x → v' = 1<br>
+          <strong>f'(x) = (eˣ·x − eˣ·1) / x² = eˣ(x − 1)/x²</strong></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Exemple 3 — Composition</div>
+          <div class="hl">f(x) = e<sup>3x+1</sup><br>
+          u(x) = 3x + 1 → u'(x) = 3<br>
+          <strong>f'(x) = 3·e<sup>3x+1</sup></strong></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Exemple 4 — Racine composée</div>
+          <div class="hl">f(x) = √(x² + 1)<br>
+          u = x² + 1 → u' = 2x<br>
+          <strong>f'(x) = 2x / (2√(x²+1)) = x/√(x²+1)</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">Récapitulatif — Règles &amp; Exponentielle</div>
+      <ul class="summary-list">
+        <li>(xⁿ)' = n·xⁿ⁻¹ &nbsp;|&nbsp; (√x)' = 1/(2√x) &nbsp;|&nbsp; (eˣ)' = eˣ</li>
+        <li>(uv)' = u'v + uv' &nbsp;|&nbsp; (u/v)' = (u'v − uv')/v²</li>
+        <li>[f(g(x))]' = g'(x)·f'(g(x)) — dérivée de composition</li>
+        <li>eˣ &gt; 0 pour tout x ∈ ℝ ; (eˣ)' = eˣ</li>
+        <li>eᵃ⁺ᵇ = eᵃ·eᵇ &nbsp;|&nbsp; e⁻ˣ = 1/eˣ &nbsp;|&nbsp; (eᵃ)ⁿ = eⁿᵃ</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="p4">
+  <div class="char-img" style="background-image: url('kaworu.png'); opacity: 1;"></div>
+  <header class="page-header">
+    <div>
+      <div class="header-meta">Fiche 04 · Analyse</div>
+      <div class="header-title">Suites numériques</div>
+      <div class="header-subtitle">Arithmétiques, géométriques, auxiliaires, calculs</div>
+    </div>
+    <div class="header-badge">KAWORU NAGISA</div>
+    <div class="header-num">04</div>
+  </header>
+
+  <div class="content">
+    <div class="section">
+      <div class="section-title">Suite arithmétique</div>
+      <div class="grid-2">
+        <div class="card accent-border">
+          <div class="card-label">Définition</div>
+          <div class="formula">uₙ₊₁ = uₙ + r</div>
+          <p>r = raison (constante). Chaque terme s'obtient en ajoutant r au précédent.</p>
+          <div class="divider"></div>
+          <div class="card-label">Terme général</div>
+          <div class="formula accent">uₙ = u₀ + n·r &nbsp;ou&nbsp; uₙ = u₁ + (n−1)·r</div>
+          <div class="card-label" style="margin-top:14px">Somme de n+1 termes (de u₀ à uₙ)</div>
+          <div class="formula">S = (n+1) · (u₀ + uₙ) / 2</div>
+          <p style="font-size:12px;opacity:0.7">= (nb de termes) × (premier + dernier) / 2</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Méthode de Gauss — Somme 1 + 2 + … + n</div>
+          <div class="formula">S = n(n+1)/2</div>
+          <div class="hl" style="margin-top:10px">
+            <strong>Exemple :</strong> 1 + 2 + 3 + … + 100<br>
+            S = 100 × 101 / 2 = <strong>5050</strong>
+          </div>
+          <div class="divider"></div>
+          <div class="card-label">Reconnaître une suite arithmétique</div>
+          <div class="hl">
+            Calculer uₙ₊₁ − uₙ.<br>
+            Si le résultat est <strong>constant</strong>, la suite est arithmétique de raison r = uₙ₊₁ − uₙ.
+          </div>
+          <div class="card-label" style="margin-top:14px">Graphe</div>
+          <p style="font-size:13px">Les points (n, uₙ) sont <strong>alignés</strong>. La représentation graphique est une droite.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Suite géométrique</div>
+      <div class="grid-2">
+        <div class="card accent-border">
+          <div class="card-label">Définition</div>
+          <div class="formula">uₙ₊₁ = uₙ × q</div>
+          <p>q = raison (constante, q ≠ 0). Chaque terme s'obtient en multipliant par q.</p>
+          <div class="divider"></div>
+          <div class="card-label">Terme général</div>
+          <div class="formula accent">uₙ = u₀ × qⁿ &nbsp;ou&nbsp; uₙ = u₁ × qⁿ⁻¹</div>
+          <div class="card-label" style="margin-top:14px">Somme de n+1 termes (de u₀ à uₙ)</div>
+          <div class="formula">S = u₀ × (1 − qⁿ⁺¹) / (1 − q) &nbsp;si q ≠ 1</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Exemple — 6 + 12 + 24 + … + 6·2⁹</div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">Identifier : u₀ = 6, q = 2, n+1 = 10 termes</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">Appliquer S = 6 × (1 − 2¹⁰) / (1 − 2)</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">S = 6 × (1 − 1024) / (−1) = 6 × 1023 = <strong>6138</strong></div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="card-label">Reconnaître une suite géométrique</div>
+          <div class="hl">
+            Calculer uₙ₊₁ / uₙ.<br>
+            Si le résultat est <strong>constant</strong>, la suite est géométrique de raison q = uₙ₊₁/uₙ.
+          </div>
+        </div>
+      </div>
+    </div>
+
+   <div class="section">
+      <div class="section-title">Suites ni arithmétiques ni géométriques</div>
+      <div class="card">
+        <div class="card-label">Principe</div>
+        <p>Certaines suites ne sont ni arithmétiques ni géométriques. <strong>Dans un exercice, une seconde suite auxiliaire sera donnée</strong> pour t'aider à exprimer le terme général.</p>
+        <div class="grid-2" style="margin-top:16px;gap:18px">
+          <div>
+            <div class="card-label">Démarche type</div>
+            <div class="steps">
+              <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">On te donne une suite (uₙ) définie par récurrence (ex: uₙ₊₁ = 2uₙ + 3)</div>
+              </div>
+              <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">L'énoncé <strong>introduit une suite auxiliaire</strong> (ex: on pose vₙ = uₙ + 3)</div>
+              </div>
+              <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">Tu montres que (vₙ) est <strong>géométrique</strong> en calculant vₙ₊₁ / vₙ</div>
+              </div>
+              <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-body">Tu exprimes vₙ puis <strong>uₙ = vₙ − 3</strong> pour retrouver le terme général</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card-label">Exemple guidé — uₙ₊₁ = 2uₙ + 3, u₀ = 1</div>
+            <div class="hl">
+              <strong>Énoncé :</strong> On pose vₙ = uₙ + 3<br><br>
+              vₙ₊₁ = uₙ₊₁ + 3 = (2uₙ + 3) + 3 = 2uₙ + 6 = 2(uₙ + 3) = 2vₙ<br>
+              → (vₙ) est <strong>géométrique</strong> de raison q = 2<br>
+              v₀ = u₀ + 3 = 1 + 3 = 4<br>
+              vₙ = 4 × 2ⁿ<br><br>
+              <strong>Donc uₙ = vₙ − 3 = 4 × 2ⁿ − 3</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Tableau de comparaison</div>
+      <div class="card">
+        <table class="data-table">
+          <tr><th></th><th>Arithmétique</th><th>Géométrique</th></tr>
+          <tr><td>Relation de récurrence</td><td>uₙ₊₁ = uₙ + r</td><td>uₙ₊₁ = uₙ × q</td></tr>
+          <tr><td>Terme général</td><td>u₀ + n·r</td><td>u₀ × qⁿ</td></tr>
+          <tr><td>Test de reconnaissance</td><td>uₙ₊₁ − uₙ = cste</td><td>uₙ₊₁/uₙ = cste</td></tr>
+          <tr><td>Graphe (n, uₙ)</td><td>Points alignés (droite)</td><td>Courbe exponentielle</td></tr>
+          <tr><td>Somme</td><td>(n+1)(u₀+uₙ)/2</td><td>u₀(1−qⁿ⁺¹)/(1−q)</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">Récapitulatif — Suites</div>
+      <ul class="summary-list">
+        <li>Arithmétique : uₙ = u₀ + n·r &nbsp;|&nbsp; S = (n+1)(u₀+uₙ)/2</li>
+        <li>Géométrique : uₙ = u₀·qⁿ &nbsp;|&nbsp; S = u₀(1−qⁿ⁺¹)/(1−q)</li>
+        <li>Gauss : 1 + 2 + … + n = n(n+1)/2</li>
+        <li>Suite affine : chercher le point fixe, poser vₙ = uₙ − ℓ → (vₙ) géométrique</li>
+        <li>Reconnaissance : différences constantes → arithmétique ; quotients constants → géométrique</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="p5">
+  <div class="char-img" style="background-image: url('misato.png'); opacity: 1;"></div>
+  <header class="page-header">
+    <div>
+      <div class="header-meta">Fiche 05 · Dénombrement &amp; Probabilités</div>
+      <div class="header-title">Probabilités</div>
+      <div class="header-subtitle">Événements, arbres, calculs, indépendance</div>
+    </div>
+    <div class="header-badge">MISATO</div>
+    <div class="header-num">05</div>
+  </header>
+
+  <div class="content">
+    <div class="section">
+      <div class="section-title">Vocabulaire &amp; Événements</div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-label">Univers Ω</div>
+          <p>Ensemble de toutes les <strong>issues possibles</strong> d'une expérience aléatoire.</p>
+          <div class="formula">P(Ω) = 1 &nbsp;|&nbsp; P(∅) = 0</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Événement contraire Ā</div>
+          <div class="formula accent">P(Ā) = 1 − P(A)</div>
+          <p>A et Ā sont incompatibles : A ∩ Ā = ∅</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Union &amp; Intersection</div>
+          <div class="formula">P(A∪B) = P(A) + P(B) − P(A∩B)</div>
+          <p>Si A et B incompatibles : P(A∪B) = P(A) + P(B)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Probabilité conditionnelle &amp; Indépendance</div>
+      <div class="grid-2">
+        <div class="card accent-border">
+          <div class="card-label">Probabilité conditionnelle</div>
+          <div class="formula accent">P(B|A) = P(A∩B) / P(A)</div>
+          <p>Probabilité de B sachant que A est réalisé. Nécessite P(A) &gt; 0.</p>
+          <div class="hl" style="margin-top:12px">
+            Reformulation : <br>
+            <strong>P(A∩B) = P(A) × P(B|A) = P(B) × P(A|B)</strong>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Événements indépendants</div>
+          <div class="formula">P(A∩B) = P(A) × P(B)</div>
+          <p>A et B sont indépendants si et seulement si la réalisation de l'un ne modifie pas la probabilité de l'autre.</p>
+          <div class="hl" style="margin-top:12px">
+            Équivalent : <strong>P(B|A) = P(B)</strong><br>
+            Si indépendants : P(A∩B) = P(A)·P(B)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Arbre de probabilités</div>
+      <div class="grid-2">
+        <div class="diagram-wrap">
+          <svg width="360" height="280" viewBox="0 0 360 280">
+            <circle cx="40" cy="140" r="10" fill="#5BE0A8" opacity="0.5"/>
+            <text x="55" y="144" fill="#fff" font-size="12" font-weight="600">Ω</text>
+            <line x1="50" y1="135" x2="150" y2="80" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+            <text x="80" y="100" fill="#5BE0A8" font-size="11">P(A)</text>
+            <circle cx="158" cy="76" r="8" fill="#5BE0A8" opacity="0.4"/>
+            <text x="170" y="80" fill="#5BE0A8" font-size="12" font-weight="600">A</text>
+            <line x1="50" y1="145" x2="150" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+            <text x="80" y="185" fill="rgba(91,224,168,0.6)" font-size="11">P(Ā)</text>
+            <circle cx="158" cy="204" r="8" fill="rgba(91,224,168,0.15)"/>
+            <text x="170" y="208" fill="rgba(255,255,255,0.65)" font-size="12">Ā</text>
+            <line x1="166" y1="70" x2="270" y2="35" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+            <text x="200" y="44" fill="#5BE0A8" font-size="10">P(B|A)</text>
+            <circle cx="278" cy="31" r="7" fill="#5BE0A8" opacity="0.3"/>
+            <text x="290" y="35" fill="#5BE0A8" font-size="11">B</text>
+            <text x="250" y="25" fill="rgba(255,255,255,0.35)" font-size="9">P(A∩B)</text>
+            <line x1="166" y1="82" x2="270" y2="110" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+            <text x="200" y="102" fill="rgba(91,224,168,0.5)" font-size="10">P(B̄|A)</text>
+            <circle cx="278" cy="114" r="7" fill="rgba(91,224,168,0.15)"/>
+            <text x="290" y="118" fill="rgba(255,255,255,0.55)" font-size="11">B̄</text>
+            <line x1="166" y1="198" x2="270" y2="165" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+            <text x="200" y="174" fill="#5BE0A8" font-size="10">P(B|Ā)</text>
+            <circle cx="278" cy="161" r="7" fill="#5BE0A8" opacity="0.3"/>
+            <text x="290" y="165" fill="#5BE0A8" font-size="11">B</text>
+            <line x1="166" y1="210" x2="270" y2="238" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+            <text x="200" y="235" fill="rgba(91,224,168,0.5)" font-size="10">P(B̄|Ā)</text>
+            <circle cx="278" cy="242" r="7" fill="rgba(91,224,168,0.15)"/>
+            <text x="290" y="246" fill="rgba(255,255,255,0.55)" font-size="11">B̄</text>
+            <text x="15" y="270" fill="rgba(255,255,255,0.25)" font-size="9">* probas. totales: P(B)= somme</text>
+          </svg>
+          <div class="diagram-caption">Règles : multiplier sur les branches · additionner les branches menant au même événement</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Règles de lecture</div>
+          <div class="hl"><strong>Multiplication :</strong> le long d'une branche<br>
+          P(A∩B) = P(A) × P(B|A)</div>
+          <div class="hl"><strong>Addition :</strong> entre les branches aboutissant au même résultat<br>
+          P(B) = P(A∩B) + P(Ā∩B)</div>
+          <div class="hl warn"><strong>Vérification :</strong> la somme de toutes les probabilités des feuilles = 1</div>
+          <div class="divider"></div>
+          <div class="card-label">Formule des probabilités totales</div>
+          <div class="formula accent">P(B) = P(A)·P(B|A) + P(Ā)·P(B|Ā)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Exemples de calcul</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Exemple 1 — Tirages avec remplacement</div>
+          <p>Urne : 3 boules rouges, 2 bleues. Deux tirages avec remise.</p>
+          <div class="hl">
+            P(rouge) = 3/5 &nbsp;|&nbsp; P(bleue) = 2/5<br>
+            P(rouge et rouge) = 3/5 × 3/5 = <strong>9/25</strong><br>
+            (tirages indépendants car avec remise)
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Exemple 2 — Tirages sans remplacement</div>
+          <p>Même urne, deux tirages sans remise.</p>
+          <div class="hl">
+            P(2ème rouge | 1er rouge) = 2/4 = 1/2<br>
+            P(rouge ∩ rouge) = 3/5 × 1/2 = <strong>3/10</strong><br>
+            (non indépendants car sans remise)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">Récapitulatif — Probabilités</div>
+      <ul class="summary-list">
+        <li>P(Ā) = 1 − P(A) &nbsp;|&nbsp; P(Ω) = 1 &nbsp;|&nbsp; P(∅) = 0</li>
+        <li>P(A∪B) = P(A) + P(B) − P(A∩B)</li>
+        <li>P(B|A) = P(A∩B) / P(A) — probabilité conditionnelle</li>
+        <li>A, B indépendants ⟺ P(A∩B) = P(A)·P(B)</li>
+        <li>Arbre : multiplier sur une branche, additionner pour un même événement</li>
+        <li>P(B) = P(A)·P(B|A) + P(Ā)·P(B|Ā) — probabilités totales</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="p6">
+  <div class="char-img" style="background-image: url('Ryoji_Kaji.webp'); opacity: 1;"></div>
+  <header class="page-header">
+    <div>
+      <div class="header-meta">Fiche 06 · Informatique &amp; Algorithmique</div>
+      <div class="header-title">Algorithmes</div>
+      <div class="header-subtitle">Structures, pseudocode, Python</div>
+    </div>
+    <div class="header-badge">Kaji</div>
+    <div class="header-num">06</div>
+  </header>
+
+  <div class="content">
+    <div class="section">
+      <div class="section-title">Opérateurs — Langage naturel &amp; Python</div>
+      <div class="card">
+        <table class="data-table">
+          <tr><th>Opération</th><th>Langage naturel</th><th>Python</th></tr>
+          <tr><td>Addition</td><td>a + b</td><td>a + b</td></tr>
+          <tr><td>Soustraction</td><td>a − b</td><td>a - b</td></tr>
+          <tr><td>Multiplication</td><td>a × b</td><td>a * b</td></tr>
+          <tr><td>Division</td><td>a ÷ b</td><td>a / b</td></tr>
+          <tr><td>Division entière</td><td>quotient de a par b</td><td>a // b</td></tr>
+          <tr><td>Reste (modulo)</td><td>reste de a ÷ b</td><td>a % b</td></tr>
+          <tr><td>Puissance</td><td>a puissance n</td><td>a ** n</td></tr>
+          <tr><td>Racine carrée</td><td>√a</td><td>sqrt(a) <span style="font-size:11px;opacity:0.6;">(après import math)</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Comparaisons</div>
+      <div class="card">
+        <table class="data-table">
+          <tr><th>Signification</th><th>Langage naturel</th><th>Python</th></tr>
+          <tr><td>Égal à</td><td>a = b</td><td>a == b</td></tr>
+          <tr><td>Différent de</td><td>a ≠ b</td><td>a != b</td></tr>
+          <tr><td>Inférieur à</td><td>a &lt; b</td><td>a &lt; b</td></tr>
+          <tr><td>Inférieur ou égal</td><td>a ≤ b</td><td>a &lt;= b</td></tr>
+          <tr><td>Supérieur à</td><td>a &gt; b</td><td>a &gt; b</td></tr>
+          <tr><td>Supérieur ou égal</td><td>a ≥ b</td><td>a &gt;= b</td></tr>
+        </table>
+        <div class="hl warn" style="margin-top:12px">
+          <strong>Attention :</strong> en Python, un seul <strong>=</strong> sert à l'affectation (x = 5). Pour tester l'égalité, on utilise <strong>==</strong> (x == 5).
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Structures de contrôle</div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-label">Condition — if / else</div>
+          <div class="code-block"><span class="kw">if</span> x &gt; <span class="num">0</span>:
+    print(<span class="str">"positif"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"négatif ou nul"</span>)</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Boucle — while</div>
+          <div class="code-block">n = <span class="num">0</span>
+<span class="kw">while</span> n &lt; <span class="num">10</span>:
+    print(n)
+    n = n + <span class="num">1</span></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Boucle — for i in range</div>
+          <div class="code-block">S = <span class="num">0</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">11</span>):
+    S = S + i
+print(S)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Langage naturel → Python</div>
+      <div class="card">
+        <table class="data-table">
+          <tr><th>Langage naturel</th><th>Python</th></tr>
+          <tr><td>Si … Alors … Sinon … Fin Si</td><td>if … :<br>&nbsp;&nbsp;&nbsp;&nbsp;…<br>else:<br>&nbsp;&nbsp;&nbsp;&nbsp;…</td></tr>
+          <tr><td>Tant que … Faire … Fin Tant que</td><td>while … :<br>&nbsp;&nbsp;&nbsp;&nbsp;…</td></tr>
+          <tr><td>Pour i de 1 à n Faire … Fin Pour</td><td>for i in range(1, n+1):<br>&nbsp;&nbsp;&nbsp;&nbsp;…</td></tr>
+          <tr><td>Variable x : entier</td><td>x = 0</td></tr>
+          <tr><td>x ← 5 (affectation)</td><td>x = 5</td></tr>
+          <tr><td>Afficher "bonjour"</td><td>print("bonjour")</td></tr>
+          <tr><td>Saisir x</td><td>x = int(input()) <span style="font-size:11px;opacity:0.6;">(entier)</span><br>x = float(input()) <span style="font-size:11px;opacity:0.6;">(réel)</span></td></tr>
+          <tr><td>Renvoyer valeur</td><td>return valeur</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Exemples d'algorithmes classiques</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Somme des entiers de 1 à n (Gauss)</div>
+          <div class="code-block">n = int(input())
+S = <span class="num">0</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n+<span class="num">1</span>):
+    S = S + i
+print(S)</div>
+          <div class="hl">Résultat = n(n+1)/2</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Terme d'une suite géométrique</div>
+          <div class="code-block">u = float(input())  <span class="cm">// terme u₀</span>
+q = float(input())  <span class="cm">// raison</span>
+n = int(input())    <span class="cm">// indice voulu</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(n):
+    u = u * q
+print(u)</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Recherche du maximum</div>
+          <div class="code-block"><span class="cm">// liste donnée : L = [3, 7, 2, 9]</span>
+maxi = L[<span class="num">0</span>]
+<span class="kw">for</span> val <span class="kw">in</span> L:
+    <span class="kw">if</span> val &gt; maxi:
+        maxi = val
+print(maxi)</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Dichotomie — Encadrer un zéro</div>
+          <div class="code-block">a = float(input())
+b = float(input())
+<span class="kw">while</span> b - a &gt; <span class="num">0.001</span>:
+    m = (a + b) / <span class="num">2</span>
+    <span class="kw">if</span> f(m) * f(a) &lt; <span class="num">0</span>:
+        b = m
+    <span class="kw">else</span>:
+        a = m
+print((a + b) / <span class="num">2</span>)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Fonctions en Python</div>
+      <div class="card">
+        <div class="grid-2">
+          <div>
+            <div class="card-label">Définition et appel</div>
+            <div class="code-block"><span class="kw">def</span> carre(x):
+    <span class="kw">return</span> x * x
+
+print(carre(<span class="num">5</span>))  <span class="cm">// → 25</span></div>
+          </div>
+          <div>
+            <div class="card-label">À retenir</div>
+            <ul>
+              <li><strong>def</strong> : définit une fonction</li>
+              <li><strong>return</strong> : renvoie le résultat</li>
+              <li>Une fonction s'<strong>appelle</strong> par son nom</li>
+              <li>Les paramètres sont entre parenthèses</li>
+            </ul>
+            <div class="hl" style="margin-top:12px">
+              <strong>range(a, b)</strong> va de a inclus à b <strong>exclu</strong>.<br>
+              Pour aller de 1 à n : <strong>range(1, n+1)</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">Récapitulatif — Algorithmes &amp; Python</div>
+      <ul class="summary-list">
+        <li>Opérateurs : + - * / // % ** sqrt()</li>
+        <li>Comparaisons : == != &lt; &lt;= &gt; &gt;=</li>
+        <li>if … else — condition</li>
+        <li>while … — boucle conditionnelle</li>
+        <li>for i in range(…) — boucle bornée</li>
+        <li>def … return — fonction</li>
+        <li>range(a, b) : de a inclus à b exclu</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+const particleCanvas = document.getElementById('particleCanvas');
+const ctx = particleCanvas.getContext('2d');
+let particles = [];
+let activeAccent = '#6EC1E4';
+
+function resizeCanvas() {
+  particleCanvas.width = window.innerWidth;
+  particleCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function createParticles() {
+  particles = [];
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * particleCanvas.width,
+      y: Math.random() * particleCanvas.height,
+      radius: Math.random() * 2 + 0.5,
+      speed: Math.random() * 0.3 + 0.1,
+      opacity: Math.random() * 0.6 + 0.1,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+}
+createParticles();
+
+function animateParticles() {
+  ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+  particles.forEach(p => {
+    p.y -= p.speed;
+    if (p.y < -10) {
+      p.y = particleCanvas.height + 10;
+      p.x = Math.random() * particleCanvas.width;
+    }
+    const wobble = Math.sin(Date.now() * 0.001 + p.phase) * 0.4;
+    ctx.beginPath();
+    ctx.arc(p.x + wobble, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = activeAccent;
+    ctx.globalAlpha = p.opacity * 0.5;
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+function show(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  const page = document.getElementById(id);
+  page.classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const accent = getComputedStyle(page).getPropertyValue('--accent').trim();
+  if (accent) activeAccent = accent;
+}
+
+function updateParabola() {
+  const slider = document.getElementById('sliderA');
+  const val = parseFloat(slider.value);
+  document.getElementById('sliderAVal').textContent = val.toFixed(1);
+  const path = document.getElementById('parabolaPath');
+  const rootLeft = document.getElementById('rootLeft');
+  const rootRight = document.getElementById('rootRight');
+  const rootLeftLabel = document.getElementById('rootLeftLabel');
+  const rootRightLabel = document.getElementById('rootRightLabel');
+  const vertex = document.getElementById('vertex');
+  const vertexLabel = document.getElementById('vertexLabel');
+  const cx = 160, cy0 = 120;
+  const spread = 80 / val;
+  const x1 = cx - spread;
+  const x2 = cx + spread;
+  const vx = cx;
+  const vy = cy0 - 80 * val;
+  const d = `M ${x1} ${cy0} Q ${vx} ${vy} ${x2} ${cy0}`;
+  path.setAttribute('d', d);
+  rootLeft.setAttribute('cx', x1);
+  rootLeft.setAttribute('cy', cy0);
+  rootRight.setAttribute('cx', x2);
+  rootRight.setAttribute('cy', cy0);
+  rootLeftLabel.setAttribute('x', x1 - 4);
+  rootLeftLabel.setAttribute('y', cy0 + 15);
+  rootRightLabel.setAttribute('x', x2 - 4);
+  rootRightLabel.setAttribute('y', cy0 + 15);
+  vertex.setAttribute('cx', vx);
+  vertex.setAttribute('cy', vy);
+  vertexLabel.setAttribute('x', vx + 5);
+  vertexLabel.setAttribute('y', vy - 2);
+}
+
+function updateDerivee() {
+  const slider = document.getElementById('sliderDeriv');
+  const val = parseInt(slider.value);
+  const xMin = 60, xMax = 240;
+  const xRange = xMax - xMin;
+  const a = 3 + ((val - xMin) / xRange) * 2;
+  document.getElementById('sliderDerivVal').textContent = a.toFixed(1);
+  const pointA = document.getElementById('pointA');
+  const pointALabel = document.getElementById('pointALabel');
+  const tangentLine = document.getElementById('tangentLine');
+  const cx = val;
+  const curveY = 200 - Math.pow((cx - 150) / 80, 2) * 60;
+  const slope = -2 * ((cx - 150) / 6400);
+  pointA.setAttribute('cx', cx);
+  pointA.setAttribute('cy', curveY);
+  pointALabel.setAttribute('x', cx + 8);
+  pointALabel.setAttribute('y', curveY - 6);
+  const x1 = cx - 80;
+  const y1 = curveY - slope * 80;
+  const x2 = cx + 80;
+  const y2 = curveY + slope * 80;
+  tangentLine.setAttribute('x1', Math.max(20, x1));
+  tangentLine.setAttribute('y1', Math.max(10, Math.min(230, y1)));
+  tangentLine.setAttribute('x2', Math.min(300, x2));
+  tangentLine.setAttribute('y2', Math.max(10, Math.min(230, y2)));
+}
+
+updateParabola();
+updateDerivee();
+</script>
+<div style="position:relative;height:140px;overflow:hidden;flex-shrink:0;">
+  <div style="position:absolute;inset:0;background:url('the-end-of-evangelion.jpg') center/cover;
+    filter:brightness(0.3) blur(2px);"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(6,8,15,0.95));"></div>
+  <div style="position:absolute;bottom:30px;left:20px;display:flex;align-items:center;gap:10px;">
+    <div id="chatAvatar" style="width:36px;height:36px;border-radius:50%;background:#6EC1E4;
+      background-size:cover;border:2px solid rgba(255,255,255,0.3);"></div>
+    <div>
+      <div id="chatCharName" style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;
+        color:#fff;letter-spacing:1px;">ASUKA LANGLEY</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;">Pose ta question</div>
+    </div>
+  </div>
+</div>
+<div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;
+  flex-direction:column;gap:10px;max-height:260px;font-size:13px;">
+  <div style="align-self:flex-start;background:rgba(255,255,255,0.06);padding:10px 14px;
+    border-radius:12px 12px 12px 4px;color:rgba(255,255,255,0.7);max-width:85%;
+    font-family:'DM Mono',monospace;font-size:11px;">
+    Alors comme ça t'as besoin d'aide en maths ? ...
+  </div>
+</div>
+<div style="display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06);">
+  <input id="chatInput" type="text" placeholder="Écris ta question ici..." onkeydown="if(event.key==='Enter')sendMessage()"
+    style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+    border-radius:8px;padding:10px 14px;color:#fff;font-family:'DM Sans',sans-serif;
+    font-size:13px;outline:none;">
+  <button id="chatSendBtn" onclick="sendMessage()" style="
+    background:#6EC1E4;border:none;border-radius:8px;padding:10px 16px;
+    color:#000;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;
+    letter-spacing:1px;cursor:pointer;text-transform:uppercase;
+  ">Envoyer</button>
+</div>
+
+<script>
+const characters = [
+  {
+    name: 'ASUKA LANGLEY',
+    avatar: 'url(asuka.png)',
+    color: '#FF3B3B',
+    responses: [
+      "j'en sais rien, t'as vraiment cru que j'étais un chatbot ou quoi ??? fais-le toi-même débile 😭",
+      "t'es sérieux là ? tu me demandes ça à MOI ? débrouille-toi tout seul !",
+      "antaa baka ??? fais tes devoirs comme un grand au lieu de me déranger !",
+      "j'suis pas google hein... va réviser au lieu de me parler idiot !",
+      "nan mais je rêve... tu veux pas que je passe le bac à ta place non plus ?!"
+    ]
+  },
+  {
+    name: 'SHINJI IKARI',
+    avatar: 'url(shinji.png)',
+    color: '#6EC1E4',
+    responses: [
+      "désolé... je sais pas trop... peut-être demande à quelqu'un d'autre... 😔",
+      "je suis pas très bon en maths moi-même... j'aurais vraiment aimé t'aider mais...",
+      "euh... je crois que je peux pas répondre à ça... désolé de pas pouvoir aider...",
+      "mon père me disait toujours de me débrouiller seul... mais j'y arrive pas moi non plus..."
+    ]
+  },
+  {
+    name: 'REI AYANAMI',
+    avatar: 'url(rei.webp)',
+    color: '#AEE6FF',
+    responses: [
+      "je ne possède pas cette information.",
+      "la réponse... n'est pas en moi.",
+      "tu devras chercher par toi-même. c'est ainsi que l'on apprend.",
+      "je ne suis pas programmée pour résoudre ce type de problème.",
+      "....."
+    ]
+  },
+  {
+    name: 'KAWORU NAGISA',
+    avatar: 'url(kaworu.png)',
+    color: '#B388EB',
+    responses: [
+      "les mathématiques sont comme la musique... il faut les ressentir par soi-même 🎵",
+      "je pourrais te répondre... mais où serait la beauté de la découverte ?",
+      "tu portes en toi la capacité de trouver la réponse. je crois en toi.",
+      "peut-être qu'une autre fois... quand les étoiles seront alignées ✨",
+      "la vérité que tu cherches est déjà en toi. écoute ton cœur."
+    ]
+  },
+  {
+    name: 'MISATO KATSURAGI',
+    avatar: 'url(misato.png)',
+    color: '#5BE0A8',
+    responses: [
+      "écoute gamin... j'ai déjà assez de paperasse comme ça ! fais-le toi-même ! 🍺",
+      "mouais... je suis plus douée pour le combat que pour les maths, déso !",
+      "va réviser au lieu de traîner ici ! ... et pense à boire de l'eau !",
+      "tu crois que j'ai le temps de faire tes devoirs ?! j'ai des anges à combattre moi !"
+    ]
+  },
+  {
+    name: 'RYOJI KAJI',
+    avatar: 'url(Ryoji_Kaji.webp)',
+    color: '#F0C040',
+    responses: [
+      "hmm... la réponse ? je te laisse deviner. c'est plus amusant comme ça 😏",
+      "je dirais bien quelque chose... mais un mystère reste un mystère.",
+      "certaines choses doivent être découvertes par soi-même, tu ne crois pas ?",
+      "j'ai connu quelqu'un qui posait trop de questions... ça lui a pas réussi."
+    ]
+  }
+];
+
+function applyCharacter(char) {
+  document.getElementById('chatAvatar').style.backgroundImage = char.avatar;
+  document.getElementById('chatCharName').textContent = char.name;
+  document.getElementById('chatCharName').style.color = char.color;
+  document.getElementById('chatSendBtn').style.background = char.color;
+}
+
+function getRandomCharacter() {
+  const char = characters[Math.floor(Math.random() * characters.length)];
+  applyCharacter(char);
+  return char;
+}
+
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  if (panel.style.display === 'flex') {
+    panel.style.display = 'none';
+  } else {
+    panel.style.display = 'flex';
+    getRandomCharacter();
+  }
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  
+  const char = getRandomCharacter();
+  const messages = document.getElementById('chatMessages');
+  
+  const userBubble = document.createElement('div');
+  userBubble.style.cssText = 'align-self:flex-end;background:' + char.color + ';color:#000;padding:10px 14px;border-radius:12px 12px 4px 12px;max-width:85%;font-size:13px;';
+  userBubble.textContent = msg;
+  messages.appendChild(userBubble);
+  
+  const delay = 600 + Math.random() * 800;
+  setTimeout(() => {
+    const response = char.responses[Math.floor(Math.random() * char.responses.length)];
+    const botBubble = document.createElement('div');
+    botBubble.style.cssText = 'align-self:flex-start;background:rgba(255,255,255,0.06);padding:10px 14px;border-radius:12px 12px 12px 4px;color:rgba(255,255,255,0.85);max-width:85%;font-size:13px;font-style:italic;border-left:2px solid ' + char.color + ';';
+    botBubble.textContent = response;
+    messages.appendChild(botBubble);
+    messages.scrollTop = messages.scrollHeight;
+  }, delay);
+  
+  input.value = '';
+  messages.scrollTop = messages.scrollHeight;
+}
+</script>
+</body>
+</html>
