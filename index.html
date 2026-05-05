@@ -1499,75 +1499,164 @@ updateDerivee();
 
 <script>
 const characters = [
-  {
-    name: 'ASUKA LANGLEY',
-    avatar: 'url(asuka.png)',
-    color: '#FF3B3B',
-    responses: [
-      "j'en sais rien, t'as vraiment cru que j'étais un chatbot ou quoi ??? fais-le toi-même débile 😭",
-      "t'es sérieux là ? tu me demandes ça à MOI ? débrouille-toi tout seul !",
-      "antaa baka ??? fais tes devoirs comme un grand au lieu de me déranger !",
-      "j'suis pas google hein... va réviser au lieu de me parler idiot !",
-      "nan mais je rêve... tu veux pas que je passe le bac à ta place non plus ?!"
-    ]
-  },
-  {
-    name: 'SHINJI IKARI',
-    avatar: 'url(shinji.png)',
-    color: '#6EC1E4',
-    responses: [
-      "désolé... je sais pas trop... peut-être demande à quelqu'un d'autre... 😔",
-      "je suis pas très bon en maths moi-même... j'aurais vraiment aimé t'aider mais...",
-      "euh... je crois que je peux pas répondre à ça... désolé de pas pouvoir aider...",
-      "mon père me disait toujours de me débrouiller seul... mais j'y arrive pas moi non plus..."
-    ]
-  },
-  {
-    name: 'REI AYANAMI',
-    avatar: 'url(rei.webp)',
-    color: '#AEE6FF',
-    responses: [
-      "je ne possède pas cette information.",
-      "la réponse... n'est pas en moi.",
-      "tu devras chercher par toi-même. c'est ainsi que l'on apprend.",
-      "je ne suis pas programmée pour résoudre ce type de problème.",
-      "....."
-    ]
-  },
-  {
-    name: 'KAWORU NAGISA',
-    avatar: 'url(kaworu.png)',
-    color: '#B388EB',
-    responses: [
-      "les mathématiques sont comme la musique... il faut les ressentir par soi-même 🎵",
-      "je pourrais te répondre... mais où serait la beauté de la découverte ?",
-      "tu portes en toi la capacité de trouver la réponse. je crois en toi.",
-      "peut-être qu'une autre fois... quand les étoiles seront alignées ✨",
-      "la vérité que tu cherches est déjà en toi. écoute ton cœur."
-    ]
-  },
-  {
-    name: 'MISATO KATSURAGI',
-    avatar: 'url(misato.png)',
-    color: '#5BE0A8',
-    responses: [
-      "écoute gamin... j'ai déjà assez de paperasse comme ça ! fais-le toi-même ! 🍺",
-      "mouais... je suis plus douée pour le combat que pour les maths, déso !",
-      "va réviser au lieu de traîner ici ! ... et pense à boire de l'eau !",
-      "tu crois que j'ai le temps de faire tes devoirs ?! j'ai des anges à combattre moi !"
-    ]
-  },
-  {
-    name: 'RYOJI KAJI',
-    avatar: 'url(Ryoji_Kaji.webp)',
-    color: '#F0C040',
-    responses: [
-      "hmm... la réponse ? je te laisse deviner. c'est plus amusant comme ça 😏",
-      "je dirais bien quelque chose... mais un mystère reste un mystère.",
-      "certaines choses doivent être découvertes par soi-même, tu ne crois pas ?",
-      "j'ai connu quelqu'un qui posait trop de questions... ça lui a pas réussi."
-    ]
-  }
+{
+name: 'ASUKA LANGLEY',
+avatar: 'url(asuka.png)',
+color: '#FF3B3B',
+responses: [
+"t'es sérieux là ??? fais-le toi-même !",
+"antaa baka ??? réfléchis un peu !",
+"j'suis pas ton cerveau de secours !",
+"tu veux que je fasse tout à ta place aussi ?!",
+"c'est même pas compliqué... enfin pour moi 😏",
+"pff... pathétique.",
+"t'as essayé de réfléchir au moins 2 secondes ?",
+"tu me fais perdre mon temps là !",
+"tch... même un enfant ferait mieux.",
+"je vais pas t'aider si t'es pas capable d'essayer.",
+"tu crois que je suis là pour ça ?!",
+"réveille-toi un peu !",
+"j'ai mieux à faire que répondre à ça.",
+"t'abuses complètement...",
+"tu veux vraiment que je te respecte après ça ?",
+"tu comprends rien ou quoi ?!",
+"c'est honteux à ce niveau-là.",
+"même shinji ferait un effort... enfin presque.",
+"tu comptes survivre comment comme ça ?",
+"j'espère que tu plaisantes."
+]
+},
+
+{
+name: 'SHINJI IKARI',
+avatar: 'url(shinji.png)',
+color: '#6EC1E4',
+responses: [
+"désolé... je sais pas...",
+"je suis pas sûr de comprendre...",
+"peut-être que tu devrais demander à quelqu'un d'autre...",
+"j'aimerais aider mais... j'y arrive pas...",
+"je suis vraiment nul pour ça...",
+"pardon...",
+"je vais juste empirer les choses si j'essaie...",
+"je préfère pas répondre...",
+"ça me stresse un peu...",
+"je crois que je vais me tromper...",
+"je veux pas dire n'importe quoi...",
+"c'est trop compliqué pour moi...",
+"je suis désolé...",
+"je peux pas...",
+"je sais pas quoi dire...",
+"j'aurais voulu être utile...",
+"peut-être que toi tu peux y arriver...",
+"je suis pas à la hauteur...",
+"excuse-moi..."
+]
+},
+
+{
+name: 'REI AYANAMI',
+avatar: 'url(rei.webp)',
+color: '#AEE6FF',
+responses: [
+"je ne sais pas.",
+"information indisponible.",
+"cela dépasse mes capacités actuelles.",
+"la réponse n'est pas ici.",
+"tu dois chercher.",
+"ce n'est pas nécessaire.",
+"je ne peux pas répondre.",
+"...",
+"analyse incomplète.",
+"données insuffisantes.",
+"je n'ai pas été conçue pour cela.",
+"la solution t'appartient.",
+"je ne possède pas cette réponse.",
+"cela ne m'est pas accessible.",
+"silence.",
+"je n'interviendrai pas.",
+"cherche par toi-même.",
+"je reste neutre."
+]
+},
+
+{
+name: 'KAWORU NAGISA',
+avatar: 'url(kaworu.png)',
+color: '#B388EB',
+responses: [
+"la réponse est déjà en toi.",
+"tu dois simplement l'écouter.",
+"la vérité ne se donne pas, elle se découvre.",
+"n'est-ce pas plus beau ainsi ?",
+"je pourrais répondre... mais ce serait dommage.",
+"les réponses faciles n'ont pas de valeur.",
+"cherche, et tu trouveras.",
+"je crois en ta capacité.",
+"chaque question est une porte.",
+"la réponse viendra au bon moment.",
+"patience...",
+"écoute ton cœur.",
+"tout a un sens, même ton doute.",
+"ce silence est une réponse.",
+"tu es plus proche que tu ne le penses.",
+"la découverte fait partie du voyage.",
+"je te laisse ce plaisir.",
+"le mystère est précieux."
+]
+},
+
+{
+name: 'MISATO KATSURAGI',
+avatar: 'url(misato.png)',
+color: '#5BE0A8',
+responses: [
+"hey ! fais un effort un peu !",
+"j'ai pas que ça à faire moi !",
+"essaie déjà par toi-même !",
+"tu vas jamais apprendre comme ça !",
+"allez, au boulot !",
+"j'suis pas ton prof particulier !",
+"un peu de discipline !",
+"tu veux que je fasse ton boulot aussi ?!",
+"t'abuses là franchement !",
+"prends une feuille et réfléchis !",
+"ça va pas se faire tout seul !",
+"je peux pas t'aider tout le temps !",
+"bouge-toi un peu !",
+"t'as un cerveau, utilise-le !",
+"je suis occupée moi !",
+"reviens quand t'auras essayé !",
+"tu peux le faire, mais faut essayer !",
+"allez hop, motivation !"
+]
+},
+
+{
+name: 'RYOJI KAJI',
+avatar: 'url(Ryoji_Kaji.webp)',
+color: '#F0C040',
+responses: [
+"hmm... intéressant.",
+"je te laisse deviner.",
+"ce serait trop facile sinon.",
+"un mystère reste un mystère.",
+"tu préfères pas chercher un peu ?",
+"la réponse est rarement offerte.",
+"je pourrais répondre... mais non 😏",
+"où serait le plaisir ?",
+"tu es curieux... c'est bien.",
+"continue comme ça.",
+"les réponses faciles sont ennuyeuses.",
+"je te fais confiance pour trouver.",
+"un peu de réflexion ne fait pas de mal.",
+"c'est plus amusant ainsi.",
+"je garde ça pour moi.",
+"chaque chose en son temps.",
+"tu n'as pas besoin de moi pour ça.",
+"cherche mieux."
+]
+}
 ];
 
 function applyCharacter(char) {
