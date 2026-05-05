@@ -5,7 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Révision Mathématiques — Première Spécialité</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
+  @media (max-width: 500px) {
+  button[onclick="toggleExercises()"] {
+    bottom: 16px !important;
+    right: 80px !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 10px !important;
+  }
+  #exercisesPanel {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    max-height: 65vh !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+  #exerciseContent {
+    max-height: 35vh !important;
+    font-size: 14px !important;
+    padding: 14px !important;
+  }
+  #exerciseAnswer input {
+    font-size: 16px !important;
+    padding: 12px 14px !important;
+  }
+  #exerciseAnswer button {
+    font-size: 12px !important;
+    padding: 12px !important;
+  }
+  #correctionDisplay {
+    font-size: 14px !important;
+  }
+}
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; font-size: 15px; }
 body {
@@ -768,7 +804,6 @@ svg text { font-family: 'DM Mono', monospace; }
             <tr><td>(ax + b)ⁿ</td><td>na(ax + b)ⁿ⁻¹</td></tr>
             <tr><td>√(u(x))</td><td>u'(x) / (2√u)</td></tr>
             <tr><td>eᵘ⁽ˣ⁾</td><td>u'(x) · eᵘ⁽ˣ⁾</td></tr>
-            <td>u'(x) / u(x)</td></tr>
           </table>
         </div>
       </div>
