@@ -1579,6 +1579,7 @@ updateDerivee();
   ">Envoyer</button>
 </div>
 
+<!-- Replace from line ~2590 (the entire script block including the button and panel) -->
 <script>
   let currentExercise = null;
 
@@ -1595,14 +1596,17 @@ function toggleExercises() {
 function generateExercise() {
   document.getElementById('exerciseAnswer').style.display = 'none';
   document.getElementById('correctionDisplay').style.display = 'none';
-  document.getElementById('answerInput').value = '';
   
   const types = [
     'trinome_delta', 'trinome_inequation', 'derivee_calc', 'derivee_tangente',
     'exp_derivee', 'exp_inequation', 'suite_raison', 'suite_somme_gauss',
-    'suite_geo_somme', 'prob_conditionnelle', 'prob_arbre', 'rappels_cours'
+    'suite_geo_somme', 'prob_conditionnelle', 'prob_arbre', 'rappels_cours',
+    'trinome_factor', 'trinome_signe', 'derivee_variation', 'exp_equation',
+    'suite_auxiliaire', 'prob_independance', 'prob_denombrement'
   ];
   const type = types[Math.floor(Math.random() * types.length)];
+  
+  let answerHTML = '';
   
   if (type === 'trinome_delta') {
     const a = Math.floor(Math.random() * 4) + 1;
@@ -1624,14 +1628,22 @@ function generateExercise() {
     }
     currentExercise = {
       question: `Soit f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}.<br>Calcule Δ, α, β et résous f(x) = 0.`,
-      answer: `Δ=${delta}`,
-      answerStr: `Δ=${delta}`,
+      answer: delta,
+      answerStr: `${delta}`,
+      answers: { delta: delta, alpha: alpha.toFixed(2), beta: beta.toFixed(2) },
       correction: `<strong>1) Δ = b² − 4ac = ${b}² − 4×${a}×(${c}) = ${b*b} − ${4*a*c} = ${delta}</strong><br>
         <strong>2) α = −b/(2a) = ${-b}/(2×${a}) = ${alpha.toFixed(2)}</strong><br>
         <strong>3) β = f(α) = ${a}×(${alpha.toFixed(2)})² ${b >= 0 ? '+' : ''}${b}×${alpha.toFixed(2)} ${c >= 0 ? '+' : ''}${c} = ${beta.toFixed(2)}</strong><br>
         <strong>4) ${solutions}</strong>`
     };
-    document.getElementById('exerciseContent').innerHTML = `<strong>Trinôme complet :</strong><br>${currentExercise.question}<br><br><em style="color:rgba(255,255,255,0.4);font-size:11px;">Donne Δ puis les solutions (ex: "Δ=1, x1=2, x2=3" ou "Δ=-4, pas de solution")</em>`;
+    document.getElementById('exerciseContent').innerHTML = `<strong>Trinôme complet :</strong><br>${currentExercise.question}`;
+    answerHTML = `
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <span>Δ = <input id="boxDelta" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>
+        <span>α = <input id="boxAlpha" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>
+        <span>β = <input id="boxBeta" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>
+        <span>Solutions : <input id="boxSol" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>
+      </div>`;
   }
   
   else if (type === 'trinome_inequation') {
@@ -1644,7 +1656,8 @@ function generateExercise() {
     currentExercise = {
       question: `Résous l'inéquation : (x ${x1 >= 0 ? '-' + x1 : '+ ' + Math.abs(x1)})(x ${x2 >= 0 ? '-' + x2 : '+ ' + Math.abs(x2)}) ${ineq}`,
       answer: intervalle,
-      answerStr: intervalle,
+      answerStr: intervalle.replace(/−/g,'-').replace(/∞/g,'inf').replace(/∪/g,'U').replace(/\s/g,''),
+      answers: { intervalle: intervalle },
       correction: `Racines : x₁ = ${x1} et x₂ = ${x2}<br>
         Tableau de signes (a = 1 > 0) :<br>
         x ∈ ]−∞ ; ${x1}[ → signe +<br>
@@ -1653,6 +1666,48 @@ function generateExercise() {
         On veut (x−${x1})(x−${x2}) ${ineq} → <strong>S = ${intervalle}</strong>`
     };
     document.getElementById('exerciseContent').innerHTML = `<strong>Inéquation :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>S = <input id="boxIntervalle" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
+  }
+
+  else if (type === 'trinome_factor') {
+    const a = Math.floor(Math.random() * 2) + 2;
+    const x1 = Math.floor(Math.random() * 5) - 2;
+    const x2 = x1 + Math.floor(Math.random() * 4) + 2;
+    const b = -a*(x1+x2);
+    const c = a*x1*x2;
+    currentExercise = {
+      question: `Factorise : f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}`,
+      answer: `${a}(x${x1 >= 0 ? '-' + x1 : '+' + Math.abs(x1)})(x${x2 >= 0 ? '-' + x2 : '+' + Math.abs(x2)})`,
+      answerStr: `${a}(x${x1 >= 0 ? '-' + x1 : '+' + Math.abs(x1)})(x${x2 >= 0 ? '-' + x2 : '+' + Math.abs(x2)})`,
+      answers: { forme: `${a}(x${x1 >= 0 ? '-' + x1 : '+' + Math.abs(x1)})(x${x2 >= 0 ? '-' + x2 : '+' + Math.abs(x2)})` },
+      correction: `Δ = ${b*b - 4*a*c} > 0 → x₁ = ${x1}, x₂ = ${x2}<br><strong>f(x) = ${a}(x − ${x1})(x − ${x2})</strong>`
+    };
+    document.getElementById('exerciseContent').innerHTML = `<strong>Factorisation :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>f(x) = <input id="boxFactor" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
+  }
+
+  else if (type === 'trinome_signe') {
+    const a_sign = Math.random() > 0.5 ? 1 : -1;
+    const x1 = Math.floor(Math.random() * 6) - 3;
+    const x2 = x1 + Math.floor(Math.random() * 4) + 2;
+    const a = a_sign * (Math.floor(Math.random() * 3) + 1);
+    const b = -a*(x1+x2);
+    const c = a*x1*x2;
+    const pos = a > 0 ? `]−∞ ; ${x1}[ ∪ ]${x2} ; +∞[` : `]${x1} ; ${x2}[`;
+    const neg = a > 0 ? `]${x1} ; ${x2}[` : `]−∞ ; ${x1}[ ∪ ]${x2} ; +∞[`;
+    currentExercise = {
+      question: `Étudie le signe de f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}`,
+      answer: `positif sur ${pos}, negatif sur ${neg}`,
+      answerStr: `positif sur ${pos}, negatif sur ${neg}`,
+      answers: { positif: pos, negatif: neg },
+      correction: `Racines : x₁ = ${x1}, x₂ = ${x2}<br>a = ${a} ${a > 0 ? '> 0' : '< 0'}<br>
+        <strong>f(x) ≥ 0 sur ${pos}</strong><br>
+        <strong>f(x) ≤ 0 sur ${neg}</strong>`
+    };
+    document.getElementById('exerciseContent').innerHTML = `<strong>Signe du trinôme :</strong><br>${currentExercise.question}`;
+    answerHTML = `
+      <span>f(x) ≥ 0 sur <input id="boxPos" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>
+      <span>f(x) ≤ 0 sur <input id="boxNeg" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'derivee_calc') {
@@ -1660,16 +1715,20 @@ function generateExercise() {
       { f: 'x³ + 2x² − 5x + 1', fprime: '3x² + 4x − 5' },
       { f: '4x² − 3x + 7', fprime: '8x − 3' },
       { f: '2x⁴ − x² + 6x', fprime: '8x³ − 2x + 6' },
-      { f: '√x + x²', fprime: '1/(2√x) + 2x' }
+      { f: '√x + x²', fprime: '1/(2√x) + 2x' },
+      { f: 'eˣ + 3x²', fprime: 'eˣ + 6x' },
+      { f: '5/x + x³', fprime: '−5/x² + 3x²' }
     ];
     const func = funcs[Math.floor(Math.random() * funcs.length)];
     currentExercise = {
       question: `Calcule la dérivée de f(x) = ${func.f}`,
       answer: func.fprime,
-      answerStr: func.fprime,
+      answerStr: func.fprime.replace(/\s/g,''),
+      answers: { derivee: func.fprime },
       correction: `f'(x) = <strong>${func.fprime}</strong>`
     };
     document.getElementById('exerciseContent').innerHTML = `<strong>Dérivée :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>f'(x) = <input id="boxDerivee" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'derivee_tangente') {
@@ -1680,18 +1739,36 @@ function generateExercise() {
     const fp = (x) => 2*a*x;
     const fx0 = f(x0);
     const fpx0 = fp(x0);
-    const eq = `y = ${fpx0}(x − ${x0}) + ${fx0} = ${fpx0}x ${fpx0*x0 >= 0 ? '+ ' + fpx0*x0 : '- ' + Math.abs(fpx0*x0)} → y = ${fpx0}x ${fx0 - fpx0*x0 >= 0 ? '+ ' + (fx0 - fpx0*x0) : '- ' + Math.abs(fx0 - fpx0*x0)}`;
+    const eq = `y = ${fpx0}x ${fx0 - fpx0*x0 >= 0 ? '+ ' + (fx0 - fpx0*x0) : '- ' + Math.abs(fx0 - fpx0*x0)}`;
     currentExercise = {
       question: `Soit f(x) = ${a}x² + ${b}. Donne l'équation de la tangente au point d'abscisse x = ${x0}.`,
-      answer: `y=${fpx0}x${fx0-fpx0*x0 >= 0 ? '+' + (fx0-fpx0*x0) : '-' + Math.abs(fx0-fpx0*x0)}`,
-      answerStr: `y=${fpx0}x${fx0-fpx0*x0 >= 0 ? '+' + (fx0-fpx0*x0) : '-' + Math.abs(fx0-fpx0*x0)}`,
+      answer: eq,
+      answerStr: eq.replace(/\s/g,''),
+      answers: { tangente: eq },
       correction: `<strong>1)</strong> f(${x0}) = ${a}×${x0}² + ${b} = ${fx0}<br>
         <strong>2)</strong> f'(x) = ${2*a}x → f'(${x0}) = ${2*a}×${x0} = ${fpx0}<br>
-        <strong>3)</strong> Tangente : y = f'(${x0})(x − ${x0}) + f(${x0})<br>
-        y = ${fpx0}(x − ${x0}) + ${fx0}<br>
-        <strong>y = ${fpx0}x − ${fpx0*x0} + ${fx0} = ${fpx0}x ${fx0 - fpx0*x0 >= 0 ? '+ ' + (fx0 - fpx0*x0) : '- ' + Math.abs(fx0 - fpx0*x0)}</strong>`
+        <strong>3)</strong> Tangente : y = f'(${x0})(x − ${x0}) + f(${x0}) = <strong>${eq}</strong>`
     };
     document.getElementById('exerciseContent').innerHTML = `<strong>Tangente :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>Équation : <input id="boxTangente" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
+  }
+
+  else if (type === 'derivee_variation') {
+    const a = Math.floor(Math.random() * 3) + 1;
+    const b = Math.floor(Math.random() * 10) + 2;
+    currentExercise = {
+      question: `Étudie les variations de f(x) = ${a}x³ − ${b}x sur ℝ.`,
+      answer: `croissante sur ]-∞;-${Math.sqrt(b/(3*a)).toFixed(1)}] et [${Math.sqrt(b/(3*a)).toFixed(1)};+∞[, décroissante sur [-${Math.sqrt(b/(3*a)).toFixed(1)};${Math.sqrt(b/(3*a)).toFixed(1)}]`,
+      answerStr: `croissante sur ]-∞;-${Math.sqrt(b/(3*a)).toFixed(1)}] et [${Math.sqrt(b/(3*a)).toFixed(1)};+∞[, décroissante sur [-${Math.sqrt(b/(3*a)).toFixed(1)};${Math.sqrt(b/(3*a)).toFixed(1)}]`,
+      answers: { croissante: `]-∞;-${Math.sqrt(b/(3*a)).toFixed(1)}]∪[${Math.sqrt(b/(3*a)).toFixed(1)};+∞[`, decroissante: `[-${Math.sqrt(b/(3*a)).toFixed(1)};${Math.sqrt(b/(3*a)).toFixed(1)}]` },
+      correction: `f'(x) = ${3*a}x² − ${b}<br>f'(x) = 0 ⇔ x = ±√(${b}/${3*a}) ≈ ±${Math.sqrt(b/(3*a)).toFixed(2)}<br>
+        <strong>Croissante sur ]−∞ ; −${Math.sqrt(b/(3*a)).toFixed(2)}] ∪ [${Math.sqrt(b/(3*a)).toFixed(2)} ; +∞[</strong><br>
+        <strong>Décroissante sur [−${Math.sqrt(b/(3*a)).toFixed(2)} ; ${Math.sqrt(b/(3*a)).toFixed(2)}]</strong>`
+    };
+    document.getElementById('exerciseContent').innerHTML = `<strong>Variations :</strong><br>${currentExercise.question}`;
+    answerHTML = `
+      <span>Croissante sur <input id="boxCroiss" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>
+      <span>Décroissante sur <input id="boxDecroiss" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'exp_derivee') {
@@ -1699,13 +1776,15 @@ function generateExercise() {
     const b = Math.floor(Math.random() * 5);
     currentExercise = {
       question: `Calcule la dérivée de f(x) = e<sup>${k}x${b > 0 ? ' + ' + b : ''}</sup>`,
-      answer: `${k}e^${k}x${b > 0 ? '+' + b : ''}`,
-      answerStr: `${k}e^${k}x${b > 0 ? '+' + b : ''}`,
+      answer: `${k}e^(${k}x${b > 0 ? '+' + b : ''})`,
+      answerStr: `${k}e^(${k}x${b > 0 ? '+' + b : ''})`,
+      answers: { derivee: `${k}e^(${k}x${b > 0 ? '+' + b : ''})` },
       correction: `f(x) = e<sup>u(x)</sup> avec u(x) = ${k}x${b > 0 ? ' + ' + b : ''}<br>
         u'(x) = ${k}<br>
         f'(x) = u'(x) × e<sup>u(x)</sup> = <strong>${k}e<sup>${k}x${b > 0 ? ' + ' + b : ''}</sup></strong>`
     };
     document.getElementById('exerciseContent').innerHTML = `<strong>Dérivée exponentielle :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>f'(x) = <input id="boxExpDer" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'exp_inequation') {
@@ -1716,11 +1795,27 @@ function generateExercise() {
       question: `Résous : e<sup>${a}x</sup> ${signe} e<sup>${b}</sup>`,
       answer: signe === '>' ? `x > ${(b/a).toFixed(2)}` : `x < ${(b/a).toFixed(2)}`,
       answerStr: signe === '>' ? `x>${(b/a).toFixed(2)}` : `x<${(b/a).toFixed(2)}`,
+      answers: { solution: signe === '>' ? `]${(b/a).toFixed(2)};+∞[` : `]-∞;${(b/a).toFixed(2)}[` },
       correction: `eˣ est strictement croissante, donc :<br>
         e<sup>${a}x</sup> ${signe} e<sup>${b}</sup> ⟺ ${a}x ${signe} ${b}<br>
         ⟺ <strong>x ${signe} ${(b/a).toFixed(2)}</strong>`
     };
     document.getElementById('exerciseContent').innerHTML = `<strong>Inéquation exponentielle :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>x ∈ <input id="boxExpIneq" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
+  }
+
+  else if (type === 'exp_equation') {
+    const a = Math.floor(Math.random() * 3) + 1;
+    const b = Math.floor(Math.random() * 10) + 2;
+    currentExercise = {
+      question: `Résous : e<sup>${a}x</sup> = ${b}`,
+      answer: `x = ${(Math.log(b)/a).toFixed(2)}`,
+      answerStr: `x=${(Math.log(b)/a).toFixed(2)}`,
+      answers: { solution: `${(Math.log(b)/a).toFixed(2)}` },
+      correction: `e<sup>${a}x</sup> = ${b}<br>${a}x = ln(${b}) ≈ ${Math.log(b).toFixed(2)}<br><strong>x = ln(${b})/${a} ≈ ${(Math.log(b)/a).toFixed(2)}</strong>`
+    };
+    document.getElementById('exerciseContent').innerHTML = `<strong>Équation exponentielle :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>x = <input id="boxExpEq" type="text" style="width:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'suite_raison') {
@@ -1735,6 +1830,7 @@ function generateExercise() {
       question: `Une suite (uₙ) est ${estGeo ? 'géométrique' : 'arithmétique'}.<br>On donne u${n1} = ${un1} et u${n2} = ${un2}.<br>Détermine la raison ${estGeo ? 'q' : 'r'} et le premier terme u₀.`,
       answer: estGeo ? `q=${r},u0=${u0}` : `r=${r},u0=${u0}`,
       answerStr: estGeo ? `q=${r},u0=${u0}` : `r=${r},u0=${u0}`,
+      answers: estGeo ? { raison: r, u0: u0 } : { raison: r, u0: u0 },
       correction: estGeo ?
         `Suite géométrique : uₙ = u₀ × qⁿ<br>
         u${n2} / u${n1} = q<sup>${n2}−${n1}</sup> = q<sup>${n2-n1}</sup><br>
@@ -1749,6 +1845,9 @@ function generateExercise() {
         u₀ = ${un1} − ${n1*r} = <strong>${u0}</strong>`
     };
     document.getElementById('exerciseContent').innerHTML = `<strong>Suite à déterminer :</strong><br>${currentExercise.question}`;
+    answerHTML = `
+      <span>Raison = <input id="boxRaison" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>
+      <span>u₀ = <input id="boxU0" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'suite_somme_gauss') {
@@ -1760,6 +1859,7 @@ function generateExercise() {
       question: `Calcule la somme : ${debut} + ${debut+1} + ${debut+2} + ... + ${fin}`,
       answer: `${somme}`,
       answerStr: `${somme}`,
+      answers: { somme: somme },
       correction: `Suite arithmétique de raison r = 1<br>
         Nombre de termes = ${fin} − ${debut} + 1 = <strong>${nb}</strong><br>
         Premier terme = ${debut}, dernier terme = ${fin}<br>
@@ -1768,6 +1868,7 @@ function generateExercise() {
         S = ${nb} × ${debut+fin} / 2 = <strong>${somme}</strong>`
     };
     document.getElementById('exerciseContent').innerHTML = `<strong>Somme (Gauss) :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>S = <input id="boxSomme" type="text" style="width:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'suite_geo_somme') {
@@ -1779,6 +1880,7 @@ function generateExercise() {
       question: `Calcule : ${u0} + ${u0*q} + ${u0*q*q} + ... + ${u0}×${q}<sup>${n}</sup> (suite géométrique)`,
       answer: `${somme}`,
       answerStr: `${somme}`,
+      answers: { somme: somme },
       correction: `Suite géométrique : u₀ = ${u0}, q = ${q}, ${n+1} termes (de u₀ à u${n})<br>
         S = u₀ × (1 − q<sup>n+1</sup>) / (1 − q)<br>
         S = ${u0} × (1 − ${q}<sup>${n+1}</sup>) / (1 − ${q})<br>
@@ -1786,6 +1888,24 @@ function generateExercise() {
         S = ${u0} × ${Math.pow(q, n+1) - 1} = <strong>${somme}</strong>`
     };
     document.getElementById('exerciseContent').innerHTML = `<strong>Somme géométrique :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>S = <input id="boxGeoSum" type="text" style="width:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
+  }
+
+  else if (type === 'suite_auxiliaire') {
+    const q = Math.floor(Math.random() * 2) + 2;
+    const c = Math.floor(Math.random() * 5) + 1;
+    const l = c/(1-q);
+    currentExercise = {
+      question: `Soit uₙ₊₁ = ${q}uₙ + ${c} avec u₀ = ${Math.floor(Math.random()*5)+1}. On pose vₙ = uₙ − ${l.toFixed(1)}. Montre que (vₙ) est géométrique et donne sa raison.`,
+      answer: `géométrique de raison ${q}`,
+      answerStr: `${q}`,
+      answers: { raison: q },
+      correction: `Point fixe ℓ = ${c}/(1−${q}) = ${l.toFixed(1)}<br>
+        vₙ₊₁ = uₙ₊₁ − ${l.toFixed(1)} = ${q}uₙ + ${c} − ${l.toFixed(1)} = ${q}(uₙ − ${l.toFixed(1)}) = ${q}vₙ<br>
+        <strong>(vₙ) est géométrique de raison q = ${q}</strong>`
+    };
+    document.getElementById('exerciseContent').innerHTML = `<strong>Suite auxiliaire :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>Raison q = <input id="boxAuxRaison" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'prob_conditionnelle') {
@@ -1795,17 +1915,22 @@ function generateExercise() {
     const pBgivenA_den = 10;
     const pAgivenB_num = Math.floor(Math.random() * 4) + 1;
     const pAgivenB_den = 10;
-    const pB_num = (pA_num * pBgivenA_num / 10) / (pAgivenB_num / 10);
+    const pAnB = (pA_num * pBgivenA_num) / 100;
+    const pB_num = pAnB / (pAgivenB_num / pAgivenB_den);
     currentExercise = {
-      question: `On a P(A) = ${pA_num}/${pA_den}, P(B|A) = ${pBgivenA_num}/${pBgivenA_den}, P(A|B) = ${pAgivenB_num}/${pAgivenB_den}.<br>Calcule P(B) puis P(A∩B).`,
-      answer: `P(B)=${(pB_num/10).toFixed(2)},P(A∩B)=${((pA_num*pBgivenA_num)/100).toFixed(2)}`,
-      answerStr: `P(B)=${(pB_num/10).toFixed(2)}`,
-      correction: `<strong>P(A∩B) = P(A) × P(B|A) = ${pA_num}/${pA_den} × ${pBgivenA_num}/${pBgivenA_den} = ${pA_num*pBgivenA_num}/${pA_den*pBgivenA_den} = ${((pA_num*pBgivenA_num)/100).toFixed(2)}</strong><br>
-        P(A∩B) = P(B) × P(A|B)<br>
-        ${((pA_num*pBgivenA_num)/100).toFixed(2)} = P(B) × ${pAgivenB_num}/${pAgivenB_den}<br>
-        <strong>P(B) = ${((pA_num*pBgivenA_num)/100).toFixed(2)} / (${pAgivenB_num}/${pAgivenB_den}) = ${(pB_num/10).toFixed(2)}</strong>`
+      question: `On a P(A) = ${pA_num}/${pA_den}, P<sub>A</sub>(B) = ${pBgivenA_num}/${pBgivenA_den}, P<sub>B</sub>(A) = ${pAgivenB_num}/${pAgivenB_den}.<br>Calcule P(B) puis P(A∩B).`,
+      answer: `P(B)=${(pB_num/10).toFixed(2)},P(A∩B)=${pAnB.toFixed(2)}`,
+      answerStr: `P(B)=${(pB_num/10).toFixed(2)},P(A∩B)=${pAnB.toFixed(2)}`,
+      answers: { PB: (pB_num/10).toFixed(2), PAnB: pAnB.toFixed(2) },
+      correction: `<strong>P(A∩B) = P(A) × P<sub>A</sub>(B) = ${pA_num}/${pA_den} × ${pBgivenA_num}/${pBgivenA_den} = ${pA_num*pBgivenA_num}/${pA_den*pBgivenA_den} = ${pAnB.toFixed(2)}</strong><br>
+        P(A∩B) = P(B) × P<sub>B</sub>(A)<br>
+        ${pAnB.toFixed(2)} = P(B) × ${pAgivenB_num}/${pAgivenB_den}<br>
+        <strong>P(B) = ${pAnB.toFixed(2)} / (${pAgivenB_num}/${pAgivenB_den}) = ${(pB_num/10).toFixed(2)}</strong>`
     };
     document.getElementById('exerciseContent').innerHTML = `<strong>Probabilités conditionnelles :</strong><br>${currentExercise.question}`;
+    answerHTML = `
+      <span>P(B) = <input id="boxPB" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>
+      <span>P(A∩B) = <input id="boxPAnB" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'prob_arbre') {
@@ -1814,33 +1939,95 @@ function generateExercise() {
     const pBgivenAbarre = Math.floor(Math.random() * 5) + 1;
     const pB = (pA/10) * (pBgivenA/10) + (1 - pA/10) * (pBgivenAbarre/10);
     currentExercise = {
-      question: `P(A) = ${pA}/10, P(B|A) = ${pBgivenA}/10, P(B|Ā) = ${pBgivenAbarre}/10.<br>Calcule P(B) avec la formule des probabilités totales.`,
+      question: `P(A) = ${pA}/10, P<sub>A</sub>(B) = ${pBgivenA}/10, P<sub>Ā</sub>(B) = ${pBgivenAbarre}/10.<br>Calcule P(B) avec la formule des probabilités totales.`,
       answer: `${pB.toFixed(2)}`,
       answerStr: `${pB.toFixed(2)}`,
-      correction: `P(B) = P(A)×P(B|A) + P(Ā)×P(B|Ā)<br>
+      answers: { PB: pB.toFixed(2) },
+      correction: `P(B) = P(A)×P<sub>A</sub>(B) + P(Ā)×P<sub>Ā</sub>(B)<br>
         P(B) = ${pA}/10 × ${pBgivenA}/10 + (1 − ${pA}/10) × ${pBgivenAbarre}/10<br>
         P(B) = ${(pA*pBgivenA)/100} + ${10-pA}/10 × ${pBgivenAbarre}/10<br>
         P(B) = ${(pA*pBgivenA)/100} + ${((10-pA)*pBgivenAbarre)/100}<br>
         <strong>P(B) = ${pB.toFixed(2)}</strong>`
     };
-    document.getElementById('exerciseContent').innerHTML = `<strong>Probabilités totales :</strong><br>${currentExercise.question}`;
+    document.getElementById('exerciseContent').innerHTML = `
+      <strong>Probabilités totales :</strong><br>${currentExercise.question}
+      <div style="margin-top:12px;text-align:center;">
+        <svg width="280" height="160" viewBox="0 0 280 160">
+          <circle cx="30" cy="80" r="8" fill="#5BE0A8" opacity="0.4"/>
+          <text x="44" y="84" fill="#fff" font-size="11" font-family="DM Mono,monospace">Ω</text>
+          <line x1="38" y1="75" x2="120" y2="40" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+          <text x="60" y="50" fill="#5BE0A8" font-size="9" font-family="DM Mono,monospace">P(A)=${pA}/10</text>
+          <circle cx="128" cy="36" r="6" fill="#5BE0A8" opacity="0.3"/>
+          <text x="138" y="40" fill="#5BE0A8" font-size="11" font-family="DM Mono,monospace">A</text>
+          <line x1="38" y1="85" x2="120" y2="120" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+          <text x="60" y="115" fill="rgba(91,224,168,0.6)" font-size="9" font-family="DM Mono,monospace">P(Ā)=${10-pA}/10</text>
+          <circle cx="128" cy="124" r="6" fill="rgba(91,224,168,0.1)"/>
+          <text x="138" y="128" fill="rgba(255,255,255,0.6)" font-size="11" font-family="DM Mono,monospace">Ā</text>
+          <line x1="134" y1="31" x2="210" y2="18" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          <text x="155" y="27" fill="#5BE0A8" font-size="8" font-family="DM Mono,monospace">P<sub>A</sub>(B)=${pBgivenA}/10</text>
+          <circle cx="216" cy="15" r="5" fill="#5BE0A8" opacity="0.3"/>
+          <text x="225" y="19" fill="#5BE0A8" font-size="10" font-family="DM Mono,monospace">B</text>
+          <line x1="134" y1="119" x2="210" y2="105" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          <text x="155" y="115" fill="#5BE0A8" font-size="8" font-family="DM Mono,monospace">P<sub>Ā</sub>(B)=${pBgivenAbarre}/10</text>
+          <circle cx="216" cy="102" r="5" fill="#5BE0A8" opacity="0.3"/>
+          <text x="225" y="106" fill="#5BE0A8" font-size="10" font-family="DM Mono,monospace">B</text>
+        </svg>
+      </div>`;
+    answerHTML = `<span>P(B) = <input id="boxPBTotal" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
+  }
+
+  else if (type === 'prob_independance') {
+    const pA_num = Math.floor(Math.random() * 4) + 2;
+    const pB_num = Math.floor(Math.random() * 3) + 2;
+    const independants = Math.random() > 0.5;
+    const pAnB_num = independants ? pA_num * pB_num / 100 : Math.floor(Math.random() * Math.min(pA_num, pB_num)) + 1;
+    const pAnB_den = 100;
+    currentExercise = {
+      question: `P(A) = ${pA_num}/10, P(B) = ${pB_num}/10, P(A∩B) = ${independants ? (pA_num*pB_num)/100 : pAnB_num/100}.<br>A et B sont-ils indépendants ?`,
+      answer: independants ? 'oui' : 'non',
+      answerStr: independants ? 'oui' : 'non',
+      answers: { independants: independants ? 'oui' : 'non' },
+      correction: `A et B indépendants ⟺ P(A∩B) = P(A) × P(B)<br>
+        P(A) × P(B) = ${pA_num}/10 × ${pB_num}/10 = ${(pA_num*pB_num)/100}<br>
+        P(A∩B) = ${independants ? (pA_num*pB_num)/100 : pAnB_num/100}<br>
+        <strong>${independants ? 'P(A∩B) = P(A)×P(B) → Ils SONT indépendants' : 'P(A∩B) ≠ P(A)×P(B) → Ils ne sont PAS indépendants'}</strong>`
+    };
+    document.getElementById('exerciseContent').innerHTML = `<strong>Indépendance :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>Indépendants ? <input id="boxIndep" type="text" style="width:60px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;" placeholder="oui/non"></span>`;
+  }
+
+  else if (type === 'prob_denombrement') {
+    const n = Math.floor(Math.random() * 5) + 2;
+    const k = Math.floor(Math.random() * (n-1)) + 1;
+    const factorielle = (x) => { let r=1; for(let i=2;i<=x;i++) r*=i; return r; };
+    const comb = factorielle(n) / (factorielle(k) * factorielle(n-k));
+    currentExercise = {
+      question: `On tire ${k} boules parmi ${n} sans ordre et sans remise.<br>Combien de combinaisons possibles ?`,
+      answer: `${comb}`,
+      answerStr: `${comb}`,
+      answers: { combinaisons: comb },
+      correction: `C(${n}, ${k}) = ${n}! / (${k}! × (${n}-${k})!)<br>
+        = ${factorielle(n)} / (${factorielle(k)} × ${factorielle(n-k)}) = <strong>${comb}</strong>`
+    };
+    document.getElementById('exerciseContent').innerHTML = `<strong>Dénombrement :</strong><br>${currentExercise.question}`;
+    answerHTML = `<span>Nombre = <input id="boxComb" type="text" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
   else if (type === 'rappels_cours') {
     const questions = [
       {
         q: "Quelle est la formule du discriminant Δ ?",
-        a: "Δ=b²-4ac",
+        a: "Δ = b² − 4ac",
         corr: "<strong>Δ = b² − 4ac</strong> pour un trinôme ax² + bx + c"
       },
       {
         q: "Quand dit-on qu'une suite est arithmétique ?",
-        a: "un+1=un+r",
+        a: "uₙ₊₁ = uₙ + r",
         corr: "Une suite est <strong>arithmétique</strong> si uₙ₊₁ = uₙ + r (différence constante)"
       },
       {
         q: "Quelle est la formule de l'équation de tangente en a ?",
-        a: "y=f'(a)(x-a)+f(a)",
+        a: "y = f'(a)(x − a) + f(a)",
         corr: "<strong>y = f'(a)(x − a) + f(a)</strong>"
       },
       {
@@ -1850,38 +2037,123 @@ function generateExercise() {
       },
       {
         q: "Que vaut P(Ā) en fonction de P(A) ?",
-        a: "1-P(A)",
+        a: "P(Ā) = 1 − P(A)",
         corr: "<strong>P(Ā) = 1 − P(A)</strong>"
       },
       {
         q: "Quelle est la somme 1 + 2 + ... + n ?",
-        a: "n(n+1)/2",
+        a: "S = n(n+1)/2",
         corr: "<strong>S = n(n+1)/2</strong> (formule de Gauss)"
+      },
+      {
+        q: "Quelle est la formule des probabilités totales ?",
+        a: "P(B) = P(A) × P_A(B) + P(Ā) × P_Ā(B)",
+        corr: "<strong>P(B) = P(A) × P<sub>A</sub>(B) + P(Ā) × P<sub>Ā</sub>(B)</strong>"
+      },
+      {
+        q: "Quand deux événements A et B sont-ils indépendants ?",
+        a: "P(A∩B) = P(A) × P(B)",
+        corr: "<strong>P(A∩B) = P(A) × P(B)</strong>"
       }
     ];
     const q = questions[Math.floor(Math.random() * questions.length)];
     currentExercise = {
       question: q.q,
       answer: q.a,
-      answerStr: q.a,
+      answerStr: q.a.replace(/\s/g,'').replace(/−/g,'-'),
+      answers: { rappel: q.a },
       correction: q.corr
     };
-    document.getElementById('exerciseContent').innerHTML = `<strong>Question de cours :</strong><br>${currentExercise.question}`;
+    document.getElementById('exerciseContent').innerHTML = `<strong>Question de cours :</strong><br>${currentExercise.question}<br><em style="color:rgba(255,255,255,0.4);font-size:11px;">Donne la formule ou l'équation demandée</em>`;
+    answerHTML = `<span>Réponse : <input id="boxRappel" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
+  document.getElementById('exerciseAnswer').innerHTML = answerHTML + `
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button onclick="checkAnswer()" style="flex:1;background:var(--accent,#6EC1E4);border:none;
+        border-radius:8px;padding:10px;color:#000;font-family:'Orbitron',sans-serif;
+        font-size:10px;font-weight:700;cursor:pointer;">Vérifier</button>
+      <button onclick="showCorrection()" style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+        border-radius:8px;padding:10px;color:#fff;font-family:'Orbitron',sans-serif;
+        font-size:10px;cursor:pointer;">Correction</button>
+    </div>`;
   document.getElementById('exerciseAnswer').style.display = 'flex';
+}
+
+function normalizeAnswer(str) {
+  return str.toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/−/g, '-')
+    .replace(/–/g, '-')
+    .replace(/—/g, '-')
+    .replace(/∞/g, 'inf')
+    .replace(/∪/g, 'U')
+    .replace(/√/g, 'sqrt')
+    .replace(/\^2/g, '²')
+    .replace(/\^(\d+)/g, (_, p) => String.fromCharCode(0x2070 + parseInt(p)))
+    .replace(/e\^/g, 'e^')
+    .replace(/\(/g, '(')
+    .replace(/\)/g, ')');
 }
 
 function checkAnswer() {
   if (!currentExercise) return;
-  const input = document.getElementById('answerInput').value.trim();
-  const correct = String(currentExercise.answerStr || currentExercise.answer).toLowerCase();
-  const userAnswer = input.toLowerCase();
-  
   const correctionDiv = document.getElementById('correctionDisplay');
   correctionDiv.style.display = 'block';
   
-  if (userAnswer === correct || userAnswer.replace(/\s/g,'') === correct.replace(/\s/g,'')) {
+  let correct = true;
+  const answers = currentExercise.answers || {};
+  const keys = Object.keys(answers);
+  
+  if (keys.length === 0) {
+    const input = document.getElementById('answerInput');
+    if (input) {
+      const userAnswer = normalizeAnswer(input.value.trim());
+      const target = normalizeAnswer(String(currentExercise.answerStr || currentExercise.answer));
+      if (userAnswer === target || userAnswer.replace(/\s/g,'') === target.replace(/\s/g,'')) {
+        correctionDiv.innerHTML = `<span style="color:#5BE0A8;">✅ Bonne réponse !</span><br>${currentExercise.correction}`;
+      } else {
+        correctionDiv.innerHTML = `<span style="color:#FF3B3B;">❌ Pas tout à fait...</span><br>${currentExercise.correction}`;
+      }
+      return;
+    }
+  }
+  
+  let userAnswers = {};
+  const boxIds = {
+    delta: 'boxDelta', alpha: 'boxAlpha', beta: 'boxBeta', solutions: 'boxSol',
+    intervalle: 'boxIntervalle', factor: 'boxFactor', positif: 'boxPos', negatif: 'boxNeg',
+    derivee: 'boxDerivee', tangente: 'boxTangente', croissante: 'boxCroiss', decroissante: 'boxDecroiss',
+    expderiv: 'boxExpDer', expineq: 'boxExpIneq', expeq: 'boxExpEq',
+    raison: 'boxRaison', u0: 'boxU0', somme: 'boxSomme', geosum: 'boxGeoSum', auxraison: 'boxAuxRaison',
+    pb: 'boxPB', panb: 'boxPAnB', pbtotal: 'boxPBTotal', indep: 'boxIndep', comb: 'boxComb', rappel: 'boxRappel'
+  };
+  
+  for (const key of keys) {
+    const idKey = key.toLowerCase().replace(/[^a-z0-9]/g,'');
+    let box = null;
+    for (const [bid, bname] of Object.entries(boxIds)) {
+      if (idKey.includes(bid) || bid.includes(idKey)) {
+        box = document.getElementById(bname);
+        if (box) break;
+      }
+    }
+    if (!box) {
+      const possibleBox = document.querySelector(`[id*="${idKey}" i]`);
+      if (possibleBox) box = possibleBox;
+    }
+    if (box) {
+      const userVal = normalizeAnswer(box.value.trim());
+      const targetVal = normalizeAnswer(String(answers[key]));
+      if (userVal !== targetVal && userVal.replace(/[\[\]]/g,'') !== targetVal.replace(/[\[\]]/g,'')) {
+        correct = false;
+      }
+    } else {
+      correct = false;
+    }
+  }
+  
+  if (correct) {
     correctionDiv.innerHTML = `<span style="color:#5BE0A8;">✅ Bonne réponse !</span><br>${currentExercise.correction}`;
   } else {
     correctionDiv.innerHTML = `<span style="color:#FF3B3B;">❌ Pas tout à fait...</span><br>${currentExercise.correction}`;
