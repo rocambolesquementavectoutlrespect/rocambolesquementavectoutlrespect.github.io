@@ -2427,6 +2427,16 @@ async function loginWithDiscord() {
   try {
     const authData = await pb.collection('users').authWithOAuth2({ provider: 'discord' });
     currentUser = authData.record;
+    
+    if (!currentUser.avatar && authData.meta && authData.meta.avatarUrl) {
+      const discordAvatarUrl = authData.meta.avatarUrl;
+      const response = await fetch(discordAvatarUrl);
+      const blob = await response.blob();
+      const formData = new FormData();
+      formData.append('avatar', blob, 'discord-avatar.png');
+      currentUser = await pb.collection('users').update(currentUser.id, formData);
+    }
+    
     refreshUI();
     closeAuthModal();
   } catch (e) {
@@ -2449,7 +2459,11 @@ function showProfileModal() {
   document.getElementById('profileDisplayName').textContent = currentUser.name || currentUser.username || 'Sans pseudo';
   document.getElementById('profileUsername').textContent = '@' + (currentUser.username || 'inconnu');
   document.getElementById('profileElo').textContent = 'Elo : ' + (currentUser.elo || 1000);
-  const avatarUrl = currentUser.avatar || (currentUser.discord_avatar ? 'https://cdn.discordapp.com/avatars/' + currentUser.discord_id + '/' + currentUser.discord_avatar + '.png' : 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect fill="%23333" width="56" height="56"/><text fill="%23fff" x="28" y="36" text-anchor="middle" font-size="24">?</text></svg>');
+  
+  let avatarUrl = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect fill="%23333" width="56" height="56"/><text fill="%23fff" x="28" y="36" text-anchor="middle" font-size="24">?</text></svg>';
+  if (currentUser.avatar) {
+    avatarUrl = pb.files.getUrl(currentUser, currentUser.avatar);
+  }
   document.getElementById('profileAvatar').src = avatarUrl;
   document.getElementById('pStatsExo').textContent = currentUser.stats_exercices || 0;
   document.getElementById('pStatsOk').textContent = currentUser.stats_bonnes || 0;
@@ -2478,17 +2492,18 @@ async function uploadAvatar(event) {
   if (!currentUser) return;
   const file = event.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    const base64 = e.target.result;
-    try {
-      currentUser = await pb.collection('users').update(currentUser.id, { avatar: base64 });
-      document.getElementById('profileAvatar').src = base64;
-      refreshUI();
-      alert('Avatar mis à jour !');
-    } catch (err) { alert('Erreur upload avatar'); }
-  };
-  reader.readAsDataURL(file);
+  try {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    currentUser = await pb.collection('users').update(currentUser.id, formData);
+    const avatarUrl = pb.files.getUrl(currentUser, currentUser.avatar);
+    document.getElementById('profileAvatar').src = avatarUrl;
+    refreshUI();
+    alert('Avatar mis à jour !');
+  } catch (err) {
+    console.error(err);
+    alert('Erreur upload avatar : ' + err.message);
+  }
 }
 
 async function showLeaderboard() {
@@ -2518,7 +2533,10 @@ function refreshUI() {
     document.getElementById('btnProfile').style.display = 'flex';
     const navPseudo = document.getElementById('navPseudo');
     navPseudo.textContent = currentUser.name || currentUser.username || 'Joueur';
-    const navAvatarUrl = currentUser.avatar || (currentUser.discord_avatar ? 'https://cdn.discordapp.com/avatars/' + currentUser.discord_id + '/' + currentUser.discord_avatar + '.png' : 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><rect fill="%23333" width="22" height="22"/><text fill="%23fff" x="11" y="15" text-anchor="middle" font-size="10">?</text></svg>');
+    let navAvatarUrl = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><rect fill="%23333" width="22" height="22"/><text fill="%23fff" x="11" y="15" text-anchor="middle" font-size="10">?</text></svg>';
+    if (currentUser.avatar) {
+      navAvatarUrl = pb.files.getUrl(currentUser, currentUser.avatar);
+    }
     document.getElementById('navAvatar').src = navAvatarUrl;
   } else {
     document.getElementById('btnLogin').style.display = 'block';
