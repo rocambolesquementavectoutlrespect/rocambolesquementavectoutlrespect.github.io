@@ -2364,16 +2364,14 @@ function sendMessage() {
 </script>
 <!-- MODAL AUTH -->
 <div id="authModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;">
-  <div style="background:rgba(10,12,22,0.98);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;width:380px;max-width:90vw;">
-    <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;text-align:center;">Connexion</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:20px;">Tes stats et ton Elo sont sauvegardés</div>
-    <input id="authEmail" type="email" placeholder="Email" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:8px;">
-    <input id="authPassword" type="password" placeholder="Mot de passe" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:12px;">
-    <div style="display:flex;gap:8px;margin-bottom:12px;">
-      <button onclick="login()" style="flex:1;background:#6EC1E4;border:none;border-radius:8px;padding:10px;color:#000;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;cursor:pointer;">Connexion</button>
-      <button onclick="register()" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px;color:#fff;font-family:'Orbitron',sans-serif;font-size:10px;cursor:pointer;">Créer compte</button>
-    </div>
-    <button onclick="closeAuthModal()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;">Annuler</button>
+  <div style="background:rgba(10,12,22,0.98);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;width:380px;max-width:90vw;text-align:center;">
+    <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;">Connexion</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:20px;">Connecte-toi avec Discord pour sauvegarder tes stats</div>
+    <button onclick="loginWithDiscord()" style="width:100%;background:#5865F2;border:none;border-radius:8px;padding:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path fill="white" d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42-.001 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+      Connexion avec Discord
+    </button>
+    <button onclick="closeAuthModal()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;margin-top:10px;">Annuler</button>
   </div>
 </div>
 
@@ -2420,32 +2418,16 @@ const pb = new PocketBase(PB_URL);
 let currentUser = null;
 let startTime = Date.now();
 
-async function login() {
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value.trim();
-  if (!email || !password) return alert('Remplis tous les champs');
+async function loginWithDiscord() {
   try {
-    const authData = await pb.collection('users').authWithPassword(email, password);
+    const authData = await pb.collection('users').authWithOAuth2({ provider: 'discord' });
     currentUser = authData.record;
     refreshUI();
     closeAuthModal();
-  } catch (e) { alert('Identifiants incorrects'); }
-}
-
-async function register() {
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value.trim();
-  if (!email || !password) return alert('Remplis tous les champs');
-  try {
-    const record = await pb.collection('users').create({
-      email, password, passwordConfirm: password,
-      elo: 1000, stats_exercices: 0, stats_bonnes: 0, stats_points: 0, stats_temps: 0, avatar: ''
-    });
-    await pb.collection('users').authWithPassword(email, password);
-    currentUser = record;
-    refreshUI();
-    closeAuthModal();
-  } catch (e) { alert('Erreur, email peut-être déjà utilisé'); }
+  } catch (e) {
+    console.error('Erreur Discord login:', e);
+    alert('Erreur de connexion Discord');
+  }
 }
 
 function logout() {
@@ -2459,7 +2441,7 @@ function showAuthModal() { document.getElementById('authModal').style.display = 
 function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
 function showProfileModal() {
   if (!currentUser) return;
-  document.getElementById('profilePseudo').textContent = currentUser.name || 'Sans pseudo';
+  document.getElementById('profilePseudo').textContent = currentUser.name || currentUser.username || 'Sans pseudo';
   document.getElementById('profileElo').textContent = 'Elo : ' + (currentUser.elo || 1000);
   document.getElementById('profileAvatar').src = currentUser.avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect fill="%23333" width="56" height="56"/><text fill="%23fff" x="28" y="36" text-anchor="middle" font-size="24">?</text></svg>';
   document.getElementById('pStatsExo').textContent = currentUser.stats_exercices || 0;
@@ -2496,7 +2478,7 @@ async function showLeaderboard() {
       html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;${isMe ? 'background:rgba(110,193,228,0.15);border:1px solid rgba(110,193,228,0.3);' : 'background:rgba(255,255,255,0.02);'}">
         <span style="width:24px;text-align:right;font-family:'Orbitron',sans-serif;color:${i < 3 ? '#F0C040' : 'rgba(255,255,255,0.5)'}">#${i+1}</span>
         <img src="${r.avatar || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22><rect fill=%22%23333%22 width=%2224%22 height=%2224%22/><text fill=%22%23fff%22 x=%2212%22 y=%2217%22 text-anchor=%22middle%22 font-size=%2210%22>?</text></svg>'}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">
-        <span style="flex:1;color:#fff;">${r.name || 'Anonyme'}</span>
+        <span style="flex:1;color:#fff;">${r.name || r.username || 'Anonyme'}</span>
         <span style="font-family:'Orbitron',sans-serif;color:#F0C040;">${r.elo || 1000}</span>
       </div>`;
     });
@@ -2511,7 +2493,7 @@ function refreshUI() {
     document.getElementById('btnLogin').style.display = 'none';
     document.getElementById('btnProfile').style.display = 'flex';
     const navPseudo = document.getElementById('navPseudo');
-    navPseudo.textContent = currentUser.name || 'Joueur';
+    navPseudo.textContent = currentUser.name || currentUser.username || 'Joueur';
     document.getElementById('navAvatar').src = currentUser.avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><rect fill="%23333" width="22" height="22"/><text fill="%23fff" x="11" y="15" text-anchor="middle" font-size="10">?</text></svg>';
   } else {
     document.getElementById('btnLogin').style.display = 'block';
@@ -2538,26 +2520,12 @@ async function saveStats(won, points) {
   } catch (e) { console.error('Erreur sauvegarde stats:', e); }
 }
 
-
 try {
-  if (pb.authStore.isValid) {
+  if (pb.authStore.isValid && pb.authStore.model) {
     currentUser = pb.authStore.model;
     refreshUI();
   }
 } catch(e) {}
-
-
-const originalCheckAnswer = typeof checkAnswer === 'function' ? checkAnswer : function(){};
-checkAnswer = function() {
-  const wasCorrect = originalCheckAnswer();
-  const correctionDiv = document.getElementById('correctionDisplay');
-  if (correctionDiv && correctionDiv.innerHTML.includes('✅')) {
-    saveStats(true, 10);
-  } else {
-    saveStats(false, 0);
-  }
-  return wasCorrect;
-};
 </script>
 </body>
 </html>
