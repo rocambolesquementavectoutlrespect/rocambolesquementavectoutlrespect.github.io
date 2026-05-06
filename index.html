@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.5/dist/pocketbase.umd.js"></script>
+</head>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -410,6 +412,11 @@ svg text { font-family: 'DM Mono', monospace; }
 
 <nav class="nav">
   <div class="nav-logo">Maths Première</div>
+  <button id="btnLogin" style="position:absolute;right:16px;top:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;z-index:1001;" onclick="showAuthModal()">Se connecter</button>
+<button id="btnProfile" style="display:none;position:absolute;right:16px;top:8px;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;z-index:1001;" onclick="showProfileModal()">
+  <img id="navAvatar" style="width:22px;height:22px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.3);">
+  <span id="navPseudo">Moi</span>
+</button>
   <button class="nav-tab active" data-target="p1" onclick="show('p1',this)">
     <span class="dot"></span> Trinôme
   </button>
@@ -2105,19 +2112,38 @@ function checkAnswer() {
   const answers = currentExercise.answers || {};
   const keys = Object.keys(answers);
   
-  if (keys.length === 0) {
-    const input = document.getElementById('answerInput');
+  if (keys.length > 0) {
+    // Vérifie les boîtes de réponse multiples
+    for (const key of keys) {
+      const box = document.querySelector(`[id*="${key}" i]`);
+      if (box) {
+        const userVal = normalizeAnswer(box.value.trim());
+        const targetVal = normalizeAnswer(String(answers[key]));
+        if (userVal !== targetVal && userVal.replace(/[\[\]]/g,'') !== targetVal.replace(/[\[\]]/g,'')) {
+          correct = false;
+        }
+      } else { correct = false; }
+    }
+  } else {
+    // Vérifie l'ancien format à champ unique
+    const input = document.getElementById('answerInput') || document.getElementById('boxAnswer');
     if (input) {
       const userAnswer = normalizeAnswer(input.value.trim());
       const target = normalizeAnswer(String(currentExercise.answerStr || currentExercise.answer));
-      if (userAnswer === target || userAnswer.replace(/\s/g,'') === target.replace(/\s/g,'')) {
-        correctionDiv.innerHTML = `<span style="color:#5BE0A8;">✅ Bonne réponse !</span><br>${currentExercise.correction}`;
-      } else {
-        correctionDiv.innerHTML = `<span style="color:#FF3B3B;">❌ Pas tout à fait...</span><br>${currentExercise.correction}`;
+      if (userAnswer !== target && userAnswer.replace(/\s/g,'') !== target.replace(/\s/g,'')) {
+        correct = false;
       }
-      return;
     }
   }
+  
+  if (correct) {
+    correctionDiv.innerHTML = `<span style="color:#5BE0A8;">✅ Bonne réponse !</span><br>${currentExercise.correction}`;
+    saveStats(true, 10);
+  } else {
+    correctionDiv.innerHTML = `<span style="color:#FF3B3B;">❌ Pas tout à fait...</span><br>${currentExercise.correction}`;
+    saveStats(false, 0);
+  }
+}
   
   let userAnswers = {};
   const boxIds = {
@@ -2377,6 +2403,205 @@ function sendMessage() {
   input.value = '';
   messages.scrollTop = messages.scrollHeight;
 }
+</script>
+<!-- MODAL AUTH -->
+<div id="authModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;">
+  <div style="background:rgba(10,12,22,0.98);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;width:380px;max-width:90vw;">
+    <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;text-align:center;">Connexion</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:20px;">Tes stats et ton Elo sont sauvegardés</div>
+    <input id="authEmail" type="email" placeholder="Email" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:8px;">
+    <input id="authPassword" type="password" placeholder="Mot de passe" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:12px;">
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button onclick="login()" style="flex:1;background:#6EC1E4;border:none;border-radius:8px;padding:10px;color:#000;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;cursor:pointer;">Connexion</button>
+      <button onclick="register()" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px;color:#fff;font-family:'Orbitron',sans-serif;font-size:10px;cursor:pointer;">Créer compte</button>
+    </div>
+    <button onclick="closeAuthModal()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL PROFIL -->
+<div id="profileModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;">
+  <div style="background:rgba(10,12,22,0.98);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;width:420px;max-width:90vw;">
+    <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:16px;text-align:center;">Mon Profil</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+      <img id="profileAvatar" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2);">
+      <div>
+        <div id="profilePseudo" style="font-weight:600;color:#fff;font-size:15px;"></div>
+        <div id="profileElo" style="font-size:12px;color:#F0C040;font-family:'Orbitron',sans-serif;"></div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:11px;">
+      <div>📝 Exercices : <span id="pStatsExo" style="color:#fff;"></span></div>
+      <div>✅ Bonnes : <span id="pStatsOk" style="color:#5BE0A8;"></span></div>
+      <div>⭐ Points : <span id="pStatsPts" style="color:#F0C040;"></span></div>
+      <div>⏱️ Temps : <span id="pStatsTime" style="color:#fff;"></span></div>
+    </div>
+    <input id="newPseudo" placeholder="Nouveau pseudo" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:8px;">
+    <input id="newAvatar" placeholder="URL de ton avatar (optionnel)" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:12px;">
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button onclick="updateProfile()" style="flex:1;background:#6EC1E4;border:none;border-radius:8px;padding:10px;color:#000;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;cursor:pointer;">Sauvegarder</button>
+      <button onclick="logout()" style="flex:1;background:rgba(255,59,59,0.3);border:1px solid rgba(255,59,59,0.4);border-radius:8px;padding:10px;color:#FF3B3B;font-family:'Orbitron',sans-serif;font-size:10px;cursor:pointer;">Déconnexion</button>
+    </div>
+    <button onclick="showLeaderboard()" style="width:100%;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);border-radius:8px;padding:10px;color:#F0C040;font-family:'Orbitron',sans-serif;font-size:10px;cursor:pointer;margin-bottom:8px;">🏆 Classement</button>
+    <button onclick="closeProfileModal()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+
+<!-- MODAL LEADERBOARD -->
+<div id="leaderboardModal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;">
+  <div style="background:rgba(10,12,22,0.98);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;width:480px;max-width:90vw;max-height:80vh;overflow-y:auto;">
+    <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:#F0C040;margin-bottom:16px;text-align:center;">🏆 Classement</div>
+    <div id="leaderboardContent" style="font-size:12px;color:rgba(255,255,255,0.8);"></div>
+    <button onclick="closeLeaderboard()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;margin-top:12px;">Fermer</button>
+  </div>
+</div>
+
+<script>
+const PB_URL = 'https://revisionsdemath.fly.dev';
+const pb = new PocketBase(PB_URL);
+let currentUser = null;
+let startTime = Date.now();
+
+// Auth
+async function login() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value.trim();
+  if (!email || !password) return alert('Remplis tous les champs');
+  try {
+    const authData = await pb.collection('users').authWithPassword(email, password);
+    currentUser = authData.record;
+    refreshUI();
+    closeAuthModal();
+  } catch (e) { alert('Identifiants incorrects'); }
+}
+
+async function register() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value.trim();
+  if (!email || !password) return alert('Remplis tous les champs');
+  try {
+    const record = await pb.collection('users').create({
+      email, password, passwordConfirm: password,
+      elo: 1000, stats_exercices: 0, stats_bonnes: 0, stats_points: 0, stats_temps: 0, avatar: ''
+    });
+    await pb.collection('users').authWithPassword(email, password);
+    currentUser = record;
+    refreshUI();
+    closeAuthModal();
+  } catch (e) { alert('Erreur, email peut-être déjà utilisé'); }
+}
+
+function logout() {
+  pb.authStore.clear();
+  currentUser = null;
+  refreshUI();
+  closeProfileModal();
+}
+
+function showAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
+function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
+function showProfileModal() {
+  if (!currentUser) return;
+  document.getElementById('profilePseudo').textContent = currentUser.name || 'Sans pseudo';
+  document.getElementById('profileElo').textContent = 'Elo : ' + (currentUser.elo || 1000);
+  document.getElementById('profileAvatar').src = currentUser.avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect fill="%23333" width="56" height="56"/><text fill="%23fff" x="28" y="36" text-anchor="middle" font-size="24">?</text></svg>';
+  document.getElementById('pStatsExo').textContent = currentUser.stats_exercices || 0;
+  document.getElementById('pStatsOk').textContent = currentUser.stats_bonnes || 0;
+  document.getElementById('pStatsPts').textContent = currentUser.stats_points || 0;
+  document.getElementById('pStatsTime').textContent = formatTime(currentUser.stats_temps || 0);
+  document.getElementById('profileModal').style.display = 'flex';
+}
+function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
+
+async function updateProfile() {
+  if (!currentUser) return;
+  const pseudo = document.getElementById('newPseudo').value.trim();
+  const avatar = document.getElementById('newAvatar').value.trim();
+  const data = {};
+  if (pseudo) data.name = pseudo;
+  if (avatar) data.avatar = avatar;
+  if (Object.keys(data).length === 0) return;
+  try {
+    currentUser = await pb.collection('users').update(currentUser.id, data);
+    refreshUI();
+    alert('Profil mis à jour !');
+  } catch (e) { alert('Erreur de mise à jour'); }
+}
+
+async function showLeaderboard() {
+  document.getElementById('leaderboardModal').style.display = 'flex';
+  document.getElementById('leaderboardContent').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.5);">Chargement...</div>';
+  try {
+    const records = await pb.collection('users').getFullList({ sort: '-elo' });
+    let html = '<div style="display:flex;flex-direction:column;gap:6px;">';
+    records.forEach((r, i) => {
+      const isMe = currentUser && r.id === currentUser.id;
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;${isMe ? 'background:rgba(110,193,228,0.15);border:1px solid rgba(110,193,228,0.3);' : 'background:rgba(255,255,255,0.02);'}">
+        <span style="width:24px;text-align:right;font-family:'Orbitron',sans-serif;color:${i < 3 ? '#F0C040' : 'rgba(255,255,255,0.5)'}">#${i+1}</span>
+        <img src="${r.avatar || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22><rect fill=%22%23333%22 width=%2224%22 height=%2224%22/><text fill=%22%23fff%22 x=%2212%22 y=%2217%22 text-anchor=%22middle%22 font-size=%2210%22>?</text></svg>'}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">
+        <span style="flex:1;color:#fff;">${r.name || 'Anonyme'}</span>
+        <span style="font-family:'Orbitron',sans-serif;color:#F0C040;">${r.elo || 1000}</span>
+      </div>`;
+    });
+    html += '</div>';
+    document.getElementById('leaderboardContent').innerHTML = html;
+  } catch (e) { document.getElementById('leaderboardContent').innerHTML = 'Erreur de chargement'; }
+}
+function closeLeaderboard() { document.getElementById('leaderboardModal').style.display = 'none'; }
+
+function refreshUI() {
+  if (currentUser) {
+    document.getElementById('btnLogin').style.display = 'none';
+    document.getElementById('btnProfile').style.display = 'flex';
+    const navPseudo = document.getElementById('navPseudo');
+    navPseudo.textContent = currentUser.name || 'Joueur';
+    document.getElementById('navAvatar').src = currentUser.avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><rect fill="%23333" width="22" height="22"/><text fill="%23fff" x="11" y="15" text-anchor="middle" font-size="10">?</text></svg>';
+  } else {
+    document.getElementById('btnLogin').style.display = 'block';
+    document.getElementById('btnProfile').style.display = 'none';
+  }
+}
+
+function formatTime(sec) { const m = Math.floor(sec/60); const s = sec%60; return m+'m '+s+'s'; }
+
+// Sauvegarde des stats après chaque exercice
+async function saveStats(won, points) {
+  if (!currentUser) return;
+  const elapsed = Math.floor((Date.now() - startTime)/1000);
+  startTime = Date.now();
+  const newElo = Math.max(0, (currentUser.elo || 1000) + (won ? 15 : -8));
+  try {
+    currentUser = await pb.collection('users').update(currentUser.id, {
+      elo: newElo,
+      stats_exercices: (currentUser.stats_exercices || 0) + 1,
+      stats_bonnes: (currentUser.stats_bonnes || 0) + (won ? 1 : 0),
+      stats_points: (currentUser.stats_points || 0) + points,
+      stats_temps: (currentUser.stats_temps || 0) + elapsed
+    });
+    refreshUI();
+  } catch (e) { console.error('Erreur sauvegarde stats:', e); }
+}
+
+// Vérifie si connecté au chargement
+try {
+  if (pb.authStore.isValid) {
+    currentUser = pb.authStore.model;
+    refreshUI();
+  }
+} catch(e) {}
+
+// Surcharge la fonction checkAnswer existante pour sauvegarder les stats
+const originalCheckAnswer = typeof checkAnswer === 'function' ? checkAnswer : function(){};
+checkAnswer = function() {
+  const wasCorrect = originalCheckAnswer();
+  const correctionDiv = document.getElementById('correctionDisplay');
+  if (correctionDiv && correctionDiv.innerHTML.includes('✅')) {
+    saveStats(true, 10);
+  } else {
+    saveStats(false, 0);
+  }
+  return wasCorrect;
+};
 </script>
 </body>
 </html>
