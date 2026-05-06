@@ -2510,7 +2510,7 @@ async function showLeaderboard() {
   document.getElementById('leaderboardModal').style.display = 'flex';
   document.getElementById('leaderboardContent').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.5);">Chargement...</div>';
   try {
-    const records = await pb.collection('users').getFullList({ sort: '-elo' });
+    const records = await pb.collection('users').getFullList({ sort: '-elo,-stats_points,-stats_bonnes' });
     const fallbackSvg = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%2224%22%20height%3D%2224%22%2F%3E%3Ctext%20fill%3D%22%23fff%22%20x%3D%2212%22%20y%3D%2217%22%20text-anchor%3D%22middle%22%20font-size%3D%2210%22%3E%3F%3C%2Ftext%3E%3C%2Fsvg%3E';
     let html = '<div style="display:flex;flex-direction:column;gap:6px;">';
     records.forEach((r, i) => {
