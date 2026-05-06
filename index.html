@@ -2076,6 +2076,7 @@ function generateExercise() {
   }
   
   document.getElementById('exerciseAnswer').innerHTML = answerHTML + `
+    <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:2px;">💡 √ = sqrt() · ² = ^2 · ∞ = inf · ∪ = U</div>
     <div style="display:flex;gap:8px;margin-top:4px;">
       <button onclick="checkAnswer()" style="flex:1;background:var(--accent,#6EC1E4);border:none;
         border-radius:8px;padding:10px;color:#000;font-family:'Orbitron',sans-serif;
@@ -2096,11 +2097,18 @@ function normalizeAnswer(str) {
     .replace(/∞/g, 'inf')
     .replace(/∪/g, 'U')
     .replace(/√/g, 'sqrt')
+    .replace(/sqrt\(/g, 'sqrt(')
     .replace(/\^2/g, '²')
+    .replace(/\^3/g, '³')
     .replace(/\^(\d+)/g, (_, p) => String.fromCharCode(0x2070 + parseInt(p)))
     .replace(/e\^/g, 'e^')
     .replace(/\(/g, '(')
-    .replace(/\)/g, ')');
+    .replace(/\)/g, ')')
+    .replace(/x\-0\)/g, 'x)')
+    .replace(/\(x\+0\)/g, '(x)')
+    .replace(/\(x-0\)/g, '(x)')
+    .replace(/\(x\+0\.0\)/g, '(x)')
+    .replace(/\(x-0\.0\)/g, '(x)');
 }
 
 function checkAnswer() {
@@ -2114,7 +2122,14 @@ function checkAnswer() {
   
   if (keys.length > 0) {
     for (const key of keys) {
-      const box = document.querySelector(`[id*="${key}" i]`);
+      // Cherche d'abord un input dont l'id contient la clé
+      let box = document.querySelector(`[id*="${key}" i]`);
+      // Si pas trouvé, cherche tous les inputs et prend le bon selon l'ordre
+      if (!box) {
+        const allInputs = document.querySelectorAll('#exerciseAnswer input[type="text"]');
+        const keyIndex = keys.indexOf(key);
+        if (allInputs[keyIndex]) box = allInputs[keyIndex];
+      }
       if (box) {
         const userVal = normalizeAnswer(box.value.trim());
         const targetVal = normalizeAnswer(String(answers[key]));
@@ -2124,7 +2139,7 @@ function checkAnswer() {
       } else { correct = false; }
     }
   } else {
-    const input = document.getElementById('answerInput') || document.getElementById('boxAnswer');
+    const input = document.getElementById('answerInput') || document.querySelector('#exerciseAnswer input[type="text"]');
     if (input) {
       const userAnswer = normalizeAnswer(input.value.trim());
       const target = normalizeAnswer(String(currentExercise.answerStr || currentExercise.answer));
@@ -2142,13 +2157,17 @@ function checkAnswer() {
     saveStats(false, 0);
   }
 }
-  
 
 function showCorrection() {
   if (!currentExercise) return;
   const correctionDiv = document.getElementById('correctionDisplay');
   correctionDiv.style.display = 'block';
-  correctionDiv.innerHTML = `<span style="color:#F0C040;">📝 Correction :</span><br>${currentExercise.correction}`;
+  correctionDiv.innerHTML = `<span style="color:#F0C040;">📝 Correction :</span><br>${currentExercise.correction}
+    <div style="margin-top:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;font-size:10px;color:rgba(255,255,255,0.4);">
+      💡 Écris les symboles comme ceci :<br>
+      √ = sqrt(...) &nbsp;|&nbsp; ² = ^2 &nbsp;|&nbsp; ∞ = inf &nbsp;|&nbsp; ∪ = U<br>
+      Ex: sqrt(x^2+1) pour √(x²+1)
+    </div>`;
 }
 
 const characters = [
