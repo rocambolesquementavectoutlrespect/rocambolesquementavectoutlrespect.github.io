@@ -2075,8 +2075,30 @@ function generateExercise() {
     answerHTML = `<span>Réponse : <input id="boxRappel" type="text" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;"></span>`;
   }
   
+    const hints = {
+    trinome_delta: 'Ex: Δ=1, α=1.5, β=-0.25, x1=1, x2=2',
+    trinome_inequation: 'Ex: ]-∞;1[U]3;+∞[ ou ]2;5[',
+    trinome_factor: 'Ex: 2(x-1)(x-3)',
+    trinome_signe: 'Ex: ]-∞;1[U]3;+∞[ pour ≥0',
+    derivee_calc: 'Ex: 3x^2+4x-5 ou 1/(2sqrt(x))',
+    derivee_tangente: 'Ex: y=6x-9',
+    derivee_variation: 'Ex: ]-∞;-1]U[2;+∞[ pour croissante',
+    exp_derivee: 'Ex: 3e^(3x+2)',
+    exp_inequation: 'Ex: ]1.5;+∞[',
+    exp_equation: 'Ex: 1.23 (arrondi à 2 décimales)',
+    suite_raison: 'raison: 2, u0: 5',
+    suite_somme_gauss: 'Ex: 5050',
+    suite_geo_somme: 'Ex: 6138',
+    suite_auxiliaire: 'Ex: 2',
+    prob_conditionnelle: 'Ex: 0.33 (pas 1/3)',
+    prob_arbre: 'Ex: 0.45',
+    prob_independance: 'oui ou non',
+    prob_denombrement: 'Ex: 6',
+    rappels_cours: 'Ex: Δ=b^2-4ac'
+  };
+  const hint = hints[type] || '';
   document.getElementById('exerciseAnswer').innerHTML = answerHTML + `
-    <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:2px;">💡 √ = sqrt() · ² = ^2 · ∞ = inf · ∪ = U</div>
+    <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:2px;">💡 √ = sqrt() · ² = ^2 · ∞ = inf · ∪ = U${hint ? ' · ' + hint : ''}</div>
     <div style="display:flex;gap:8px;margin-top:4px;">
       <button onclick="checkAnswer()" style="flex:1;background:var(--accent,#6EC1E4);border:none;
         border-radius:8px;padding:10px;color:#000;font-family:'Orbitron',sans-serif;
@@ -2122,9 +2144,7 @@ function checkAnswer() {
   
   if (keys.length > 0) {
     for (const key of keys) {
-      // Cherche d'abord un input dont l'id contient la clé
       let box = document.querySelector(`[id*="${key}" i]`);
-      // Si pas trouvé, cherche tous les inputs et prend le bon selon l'ordre
       if (!box) {
         const allInputs = document.querySelectorAll('#exerciseAnswer input[type="text"]');
         const keyIndex = keys.indexOf(key);
@@ -2133,7 +2153,18 @@ function checkAnswer() {
       if (box) {
         const userVal = normalizeAnswer(box.value.trim());
         const targetVal = normalizeAnswer(String(answers[key]));
-        if (userVal !== targetVal && userVal.replace(/[\[\]]/g,'') !== targetVal.replace(/[\[\]]/g,'')) {
+        // Vérifie aussi en convertissant les fractions (ex: 1/3 ≈ 0.33)
+        const userFloat = parseFloat(userVal);
+        const targetFloat = parseFloat(targetVal);
+        const fractionMatch = userVal.match(/^(\d+)\/(\d+)$/);
+        let userFromFraction = null;
+        if (fractionMatch) {
+          userFromFraction = (parseFloat(fractionMatch[1]) / parseFloat(fractionMatch[2])).toFixed(2);
+        }
+        if (userVal !== targetVal && 
+            userVal.replace(/[\[\]]/g,'') !== targetVal.replace(/[\[\]]/g,'') &&
+            !(userFloat && targetFloat && Math.abs(userFloat - targetFloat) < 0.01) &&
+            !(userFromFraction && targetFloat && Math.abs(parseFloat(userFromFraction) - targetFloat) < 0.01)) {
           correct = false;
         }
       } else { correct = false; }
@@ -2143,19 +2174,26 @@ function checkAnswer() {
     if (input) {
       const userAnswer = normalizeAnswer(input.value.trim());
       const target = normalizeAnswer(String(currentExercise.answerStr || currentExercise.answer));
-      if (userAnswer !== target && userAnswer.replace(/\s/g,'') !== target.replace(/\s/g,'')) {
+      const userFloat = parseFloat(userAnswer);
+      const targetFloat = parseFloat(target);
+      const fractionMatch = userAnswer.match(/^(\d+)\/(\d+)$/);
+      let userFromFraction = null;
+      if (fractionMatch) {
+        userFromFraction = (parseFloat(fractionMatch[1]) / parseFloat(fractionMatch[2])).toFixed(2);
+      }
+      if (userAnswer !== target && 
+          userAnswer.replace(/\s/g,'') !== target.replace(/\s/g,'') &&
+          !(userFloat && targetFloat && Math.abs(userFloat - targetFloat) < 0.01) &&
+          !(userFromFraction && targetFloat && Math.abs(parseFloat(userFromFraction) - targetFloat) < 0.01)) {
         correct = false;
       }
     }
   }
   
-  if (correct) {
-    correctionDiv.innerHTML = `<span style="color:#5BE0A8;">✅ Bonne réponse !</span><br>${currentExercise.correction}`;
-    saveStats(true, 10);
-  } else {
-    correctionDiv.innerHTML = `<span style="color:#FF3B3B;">❌ Pas tout à fait...</span><br>${currentExercise.correction}`;
-    saveStats(false, 0);
-  }
+  correctionDiv.innerHTML = (correct 
+    ? `<span style="color:#5BE0A8;">✅ Bonne réponse !</span><br>`
+    : `<span style="color:#FF3B3B;">❌ Pas tout à fait...</span><br>`) + currentExercise.correction;
+  saveStats(correct, correct ? 10 : 0);
 }
 
 function showCorrection() {
