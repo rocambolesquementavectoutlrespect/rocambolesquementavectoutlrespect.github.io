@@ -2380,9 +2380,14 @@ function sendMessage() {
   <div style="background:rgba(10,12,22,0.98);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;width:420px;max-width:90vw;">
     <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:16px;text-align:center;">Mon Profil</div>
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
-      <img id="profileAvatar" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2);">
+      <div style="position:relative;cursor:pointer;" onclick="document.getElementById('avatarFileInput').click()">
+        <img id="profileAvatar" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2);">
+        <div style="position:absolute;bottom:-2px;right:-2px;background:rgba(0,0,0,0.7);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;">✎</div>
+        <input id="avatarFileInput" type="file" accept="image/*" style="display:none;" onchange="uploadAvatar(event)">
+      </div>
       <div>
-        <div id="profilePseudo" style="font-weight:600;color:#fff;font-size:15px;"></div>
+        <div id="profileDisplayName" style="font-weight:600;color:#fff;font-size:15px;"></div>
+        <div id="profileUsername" style="font-size:11px;color:rgba(255,255,255,0.45);">@username</div>
         <div id="profileElo" style="font-size:12px;color:#F0C040;font-family:'Orbitron',sans-serif;"></div>
       </div>
     </div>
@@ -2392,8 +2397,8 @@ function sendMessage() {
       <div>⭐ Points : <span id="pStatsPts" style="color:#F0C040;"></span></div>
       <div>⏱️ Temps : <span id="pStatsTime" style="color:#fff;"></span></div>
     </div>
-    <input id="newPseudo" placeholder="Nouveau pseudo" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:8px;">
-    <input id="newAvatar" placeholder="URL de ton avatar (optionnel)" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:12px;">
+    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px;">Nom d'affichage (modifiable)</div>
+    <input id="newDisplayName" placeholder="Ton nom d'affichage..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:12px;">
     <div style="display:flex;gap:8px;margin-bottom:12px;">
       <button onclick="updateProfile()" style="flex:1;background:#6EC1E4;border:none;border-radius:8px;padding:10px;color:#000;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;cursor:pointer;">Sauvegarder</button>
       <button onclick="logout()" style="flex:1;background:rgba(255,59,59,0.3);border:1px solid rgba(255,59,59,0.4);border-radius:8px;padding:10px;color:#FF3B3B;font-family:'Orbitron',sans-serif;font-size:10px;cursor:pointer;">Déconnexion</button>
@@ -2441,30 +2446,49 @@ function showAuthModal() { document.getElementById('authModal').style.display = 
 function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
 function showProfileModal() {
   if (!currentUser) return;
-  document.getElementById('profilePseudo').textContent = currentUser.name || currentUser.username || 'Sans pseudo';
+  document.getElementById('profileDisplayName').textContent = currentUser.name || currentUser.username || 'Sans pseudo';
+  document.getElementById('profileUsername').textContent = '@' + (currentUser.username || 'inconnu');
   document.getElementById('profileElo').textContent = 'Elo : ' + (currentUser.elo || 1000);
-  document.getElementById('profileAvatar').src = currentUser.avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect fill="%23333" width="56" height="56"/><text fill="%23fff" x="28" y="36" text-anchor="middle" font-size="24">?</text></svg>';
+  const avatarUrl = currentUser.avatar || (currentUser.discord_avatar ? 'https://cdn.discordapp.com/avatars/' + currentUser.discord_id + '/' + currentUser.discord_avatar + '.png' : 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect fill="%23333" width="56" height="56"/><text fill="%23fff" x="28" y="36" text-anchor="middle" font-size="24">?</text></svg>');
+  document.getElementById('profileAvatar').src = avatarUrl;
   document.getElementById('pStatsExo').textContent = currentUser.stats_exercices || 0;
   document.getElementById('pStatsOk').textContent = currentUser.stats_bonnes || 0;
   document.getElementById('pStatsPts').textContent = currentUser.stats_points || 0;
   document.getElementById('pStatsTime').textContent = formatTime(currentUser.stats_temps || 0);
+  document.getElementById('newDisplayName').value = currentUser.name || '';
   document.getElementById('profileModal').style.display = 'flex';
 }
 function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
 
 async function updateProfile() {
   if (!currentUser) return;
-  const pseudo = document.getElementById('newPseudo').value.trim();
-  const avatar = document.getElementById('newAvatar').value.trim();
+  const displayName = document.getElementById('newDisplayName').value.trim();
   const data = {};
-  if (pseudo) data.name = pseudo;
-  if (avatar) data.avatar = avatar;
-  if (Object.keys(data).length === 0) return;
+  if (displayName) data.name = displayName;
+  if (Object.keys(data).length === 0) { alert('Entre un nom d\'affichage'); return; }
   try {
     currentUser = await pb.collection('users').update(currentUser.id, data);
     refreshUI();
     alert('Profil mis à jour !');
+    showProfileModal();
   } catch (e) { alert('Erreur de mise à jour'); }
+}
+
+async function uploadAvatar(event) {
+  if (!currentUser) return;
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64 = e.target.result;
+    try {
+      currentUser = await pb.collection('users').update(currentUser.id, { avatar: base64 });
+      document.getElementById('profileAvatar').src = base64;
+      refreshUI();
+      alert('Avatar mis à jour !');
+    } catch (err) { alert('Erreur upload avatar'); }
+  };
+  reader.readAsDataURL(file);
 }
 
 async function showLeaderboard() {
@@ -2494,7 +2518,8 @@ function refreshUI() {
     document.getElementById('btnProfile').style.display = 'flex';
     const navPseudo = document.getElementById('navPseudo');
     navPseudo.textContent = currentUser.name || currentUser.username || 'Joueur';
-    document.getElementById('navAvatar').src = currentUser.avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><rect fill="%23333" width="22" height="22"/><text fill="%23fff" x="11" y="15" text-anchor="middle" font-size="10">?</text></svg>';
+    const navAvatarUrl = currentUser.avatar || (currentUser.discord_avatar ? 'https://cdn.discordapp.com/avatars/' + currentUser.discord_id + '/' + currentUser.discord_avatar + '.png' : 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><rect fill="%23333" width="22" height="22"/><text fill="%23fff" x="11" y="15" text-anchor="middle" font-size="10">?</text></svg>');
+    document.getElementById('navAvatar').src = navAvatarUrl;
   } else {
     document.getElementById('btnLogin').style.display = 'block';
     document.getElementById('btnProfile').style.display = 'none';
