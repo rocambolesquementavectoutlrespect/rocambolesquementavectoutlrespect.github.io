@@ -2511,23 +2511,31 @@ async function showLeaderboard() {
   document.getElementById('leaderboardContent').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.5);">Chargement...</div>';
   try {
     const records = await pb.collection('users').getFullList({ sort: '-elo' });
+    const fallbackSvg = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%2224%22%20height%3D%2224%22%2F%3E%3Ctext%20fill%3D%22%23fff%22%20x%3D%2212%22%20y%3D%2217%22%20text-anchor%3D%22middle%22%20font-size%3D%2210%22%3E%3F%3C%2Ftext%3E%3C%2Fsvg%3E';
     let html = '<div style="display:flex;flex-direction:column;gap:6px;">';
     records.forEach((r, i) => {
       const isMe = currentUser && r.id === currentUser.id;
-      let avatarUrl = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><rect fill="%23333" width="24" height="24"/><text fill="%23fff" x="12" y="17" text-anchor="middle" font-size="10">?</text></svg>');
+      let avatarUrl = fallbackSvg;
       if (r.avatar) {
-        avatarUrl = pb.files.getUrl(r, r.avatar);
+        try {
+          avatarUrl = pb.files.getUrl(r, r.avatar);
+        } catch(e) {
+          avatarUrl = fallbackSvg;
+        }
       }
       html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;${isMe ? 'background:rgba(110,193,228,0.15);border:1px solid rgba(110,193,228,0.3);' : 'background:rgba(255,255,255,0.02);'}">
         <span style="width:24px;text-align:right;font-family:'Orbitron',sans-serif;color:${i < 3 ? '#F0C040' : 'rgba(255,255,255,0.5)'}">#${i+1}</span>
-        <img src="${avatarUrl}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" onerror="this.src='data:image/svg+xml,' + encodeURIComponent('<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22><rect fill=%22%23333%22 width=%2224%22 height=%2224%22/><text fill=%22%23fff%22 x=%2212%22 y=%2217%22 text-anchor=%22middle%22 font-size=%2210%22>?</text></svg>')">
+        <img src="${avatarUrl}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" onerror="this.onerror=null;this.src='${fallbackSvg}'">
         <span style="flex:1;color:#fff;">${r.name || r.username || 'Anonyme'}</span>
         <span style="font-family:'Orbitron',sans-serif;color:#F0C040;">${r.elo || 1000}</span>
       </div>`;
     });
     html += '</div>';
     document.getElementById('leaderboardContent').innerHTML = html;
-  } catch (e) { document.getElementById('leaderboardContent').innerHTML = 'Erreur de chargement'; }
+  } catch (e) {
+    console.error(e);
+    document.getElementById('leaderboardContent').innerHTML = 'Erreur de chargement : ' + e.message;
+  }
 }
 function closeLeaderboard() { document.getElementById('leaderboardModal').style.display = 'none'; }
 
