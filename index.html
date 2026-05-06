@@ -2113,7 +2113,6 @@ function checkAnswer() {
   const keys = Object.keys(answers);
   
   if (keys.length > 0) {
-    // Vérifie les boîtes de réponse multiples
     for (const key of keys) {
       const box = document.querySelector(`[id*="${key}" i]`);
       if (box) {
@@ -2125,7 +2124,6 @@ function checkAnswer() {
       } else { correct = false; }
     }
   } else {
-    // Vérifie l'ancien format à champ unique
     const input = document.getElementById('answerInput') || document.getElementById('boxAnswer');
     if (input) {
       const userAnswer = normalizeAnswer(input.value.trim());
@@ -2145,46 +2143,7 @@ function checkAnswer() {
   }
 }
   
-  let userAnswers = {};
-  const boxIds = {
-    delta: 'boxDelta', alpha: 'boxAlpha', beta: 'boxBeta', solutions: 'boxSol',
-    intervalle: 'boxIntervalle', factor: 'boxFactor', positif: 'boxPos', negatif: 'boxNeg',
-    derivee: 'boxDerivee', tangente: 'boxTangente', croissante: 'boxCroiss', decroissante: 'boxDecroiss',
-    expderiv: 'boxExpDer', expineq: 'boxExpIneq', expeq: 'boxExpEq',
-    raison: 'boxRaison', u0: 'boxU0', somme: 'boxSomme', geosum: 'boxGeoSum', auxraison: 'boxAuxRaison',
-    pb: 'boxPB', panb: 'boxPAnB', pbtotal: 'boxPBTotal', indep: 'boxIndep', comb: 'boxComb', rappel: 'boxRappel'
-  };
-  
-  for (const key of keys) {
-    const idKey = key.toLowerCase().replace(/[^a-z0-9]/g,'');
-    let box = null;
-    for (const [bid, bname] of Object.entries(boxIds)) {
-      if (idKey.includes(bid) || bid.includes(idKey)) {
-        box = document.getElementById(bname);
-        if (box) break;
-      }
-    }
-    if (!box) {
-      const possibleBox = document.querySelector(`[id*="${idKey}" i]`);
-      if (possibleBox) box = possibleBox;
-    }
-    if (box) {
-      const userVal = normalizeAnswer(box.value.trim());
-      const targetVal = normalizeAnswer(String(answers[key]));
-      if (userVal !== targetVal && userVal.replace(/[\[\]]/g,'') !== targetVal.replace(/[\[\]]/g,'')) {
-        correct = false;
-      }
-    } else {
-      correct = false;
-    }
-  }
-  
-  if (correct) {
-    correctionDiv.innerHTML = `<span style="color:#5BE0A8;">✅ Bonne réponse !</span><br>${currentExercise.correction}`;
-  } else {
-    correctionDiv.innerHTML = `<span style="color:#FF3B3B;">❌ Pas tout à fait...</span><br>${currentExercise.correction}`;
-  }
-}
+
 
 function showCorrection() {
   if (!currentExercise) return;
@@ -2462,7 +2421,6 @@ const pb = new PocketBase(PB_URL);
 let currentUser = null;
 let startTime = Date.now();
 
-// Auth
 async function login() {
   const email = document.getElementById('authEmail').value.trim();
   const password = document.getElementById('authPassword').value.trim();
@@ -2564,7 +2522,6 @@ function refreshUI() {
 
 function formatTime(sec) { const m = Math.floor(sec/60); const s = sec%60; return m+'m '+s+'s'; }
 
-// Sauvegarde des stats après chaque exercice
 async function saveStats(won, points) {
   if (!currentUser) return;
   const elapsed = Math.floor((Date.now() - startTime)/1000);
@@ -2582,7 +2539,7 @@ async function saveStats(won, points) {
   } catch (e) { console.error('Erreur sauvegarde stats:', e); }
 }
 
-// Vérifie si connecté au chargement
+
 try {
   if (pb.authStore.isValid) {
     currentUser = pb.authStore.model;
@@ -2590,7 +2547,7 @@ try {
   }
 } catch(e) {}
 
-// Surcharge la fonction checkAnswer existante pour sauvegarder les stats
+
 const originalCheckAnswer = typeof checkAnswer === 'function' ? checkAnswer : function(){};
 checkAnswer = function() {
   const wasCorrect = originalCheckAnswer();
